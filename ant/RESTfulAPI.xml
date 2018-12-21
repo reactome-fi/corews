@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!-- Generate a jar file from the ReactomeRESTful API project. -->
+<project name="package" default="ReactomeRESTfulAPI" basedir="..">
+	<property name="targetDir" value="lib" />
+	<property name="projectDir" value="../RESTfulAPI" />
+	<property name="projectJar" value="${targetDir}/ReactomeRESTfulAPI.jar" />
+	<property name="projectVersion" value="1.0" />
+	
+	<!-- Package some needed classes from the caBigR3 project -->
+	<target name="ReactomeRESTfulAPI">
+		<delete file="${projectJar}" />
+		<jar destfile="${projectJar}">
+			<fileset dir="${projectDir}/src">
+				<include name="org/reactome/restfulapi/*.java" />
+				<include name="org/reactome/restfulapi/models/*.java" />
+				<include name="org/reactome/restfulapi/mapper/*.java" />
+			</fileset>
+			<fileset dir="${projectDir}/build/classes">
+				<include name="org/reactome/restfulapi/*.class" />
+				<include name="org/reactome/restfulapi/models/*.class" />
+				<include name="org/reactome/restfulapi/mapper/*.class" />
+			</fileset>
+		</jar>
+		<exec executable="${targetDir}/installJar.sh">
+			<!-- file anem -->
+			<arg value="${projectJar}"/>
+			<!-- groupId -->
+			<arg value="org.reactome" />
+			<!-- artifactId -->
+			<arg value="RESTfulAPI" />
+			<!-- version -->
+			<arg value="${projectVersion}" />
+		</exec>
+	</target>
+</project>

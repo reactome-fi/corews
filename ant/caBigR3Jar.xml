@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!-- Generate a jar file from the caBigR3 project in the local maven repository -->
+<project name="package" default="jarCaBigR3" basedir="..">
+	<property name="targetDir" value="lib" />
+	<property name="eclipseHome" value="/Users/wug/Documents/eclipse_workspace" />
+	<property name="caBigR3Dir" value="${eclipseHome}/caBIGR3" />
+	<property name="caBigR3Jar" value="${targetDir}/caBIGR3.jar" />
+	<property name="caBigR3Version" value="1.0" />
+	
+	<!-- Package some needed classes from the caBigR3 project -->
+	<target name="jarCaBigR3">
+		<delete file="${caBigR3Jar}" />
+		<jar destfile="${caBigR3Jar}">
+			<fileset dir="${caBigR3Dir}/bin">
+				<include name="org/reactome/r3/util/*.class" />
+				<include name="org/reactome/r3/graph/*.class" />
+				<include name="org/reactome/r3/cluster/*.class" />
+				<include name="org/reactome/annotate/*.class" />
+				<include name="org/reactome/cancerindex/model/*.class" />
+				<include name="org/reactome/cancerindex/model/*.xml" />
+				<include name="org/reactome/pagerank/*.class" />
+				<include name="org/reactome/factorgraph/*.class" />
+				<include name="org/reactome/factorgraph/common/*.class" />
+				<include name="org/reactome/pathway/factorgraph/*.class" />
+				<include name="org/reactome/booleannetwork/*.class" />
+				<include name="org/reactome/pathway/booleannetwork/*.class" />
+			</fileset>
+			<fileset dir="${caBigR3Dir}/src">
+				<include name="org/reactome/r3/util/*.java" />
+				<include name="org/reactome/r3/graph/*.java" />
+				<include name="org/reactome/r3/cluster/*.java" />
+				<include name="org/reactome/annotate/*.java" />
+				<include name="org/reactome/cancerindex/model/*.java" />
+				<include name="org/reactome/pagerank/*.java" />
+				<include name="org/reactome/factorgraph/*.java" />
+				<include name="org/reactome/factorgraph/common/*.java" />
+				<include name="org/reactome/pathway/factorgraph/*.java" />
+				<include name="org/reactome/booleannetwork/*.java" />
+				<include name="org/reactome/pathway/booleannetwork/*.java" />
+			</fileset>
+		</jar>
+		<exec executable="${targetDir}/installJar.sh">
+			<!-- file anem -->
+			<arg value="${caBigR3Jar}"/>
+			<!-- groupId -->
+			<arg value="org.reactome" />
+			<!-- artifactId -->
+			<arg value="caBIGR3" />
+			<!-- version -->
+			<arg value="${caBigR3Version}" />
+		</exec>
+	</target>
+</project>

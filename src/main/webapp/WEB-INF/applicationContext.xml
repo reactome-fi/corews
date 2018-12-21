@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:jaxws="http://cxf.apache.org/jaxws"
+    xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+    <!-- import resource="classpath:META-INF/cxf/cxf.xml" />
+    <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+    <import resource="classpath:META-INF/cxf/cxf-extension-xml.xml" />
+    <import resource="classpath:META-INF/cxf/cxf-extension-http-binding.xml" />
+    <import resource="classpath:META-INF/cxf/cxf-servlet.xml" / -->
+    <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="location">
+            <value>WEB-INF/config.prop</value>
+        </property>
+    </bean>
+    
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        <property name="configLocation">
+            <value>/WEB-INF/funcIntHibernate.cfg.xml</value>
+        </property>
+    </bean>
+    
+    <bean id="cgiSessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        <property name="configLocation">
+            <value>/WEB-INF/cancerindex.hibernate.cfg.xml</value>
+        </property>
+    </bean>
+    
+    <bean id="interactionDAO" class="org.reactome.r3.service.HibernateInteractionDAO">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory"/>
+        </property>
+    </bean>
+    
+    <bean id="interactionService" class="org.reactome.r3.service.InteractionServiceImpl">
+        <property name="interactionDAO">
+            <ref bean="interactionDAO" />
+        </property>
+    </bean>
+    
+    <!-- InteractionDAO to load FIs from a pre-generated File -->
+    <bean id="fileFIService" class="org.reactome.r3.service.FileInteractionService">
+        <property name="fIFile">
+            <value>${resources.dir}${fi.gene.file}</value>
+        </property>
+        <property name="delegator">
+            <ref bean="interactionService"></ref>
+        </property>
+    </bean>
+    
+    <bean id="srcDBA" class="org.gk.persistence.MySQLAdaptor">
+        <constructor-arg index="0">
+            <value>${jdbc.dbHost}</value>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <value>${Reactome.src.dbName}</value>
+        </constructor-arg>
+        <constructor-arg index="2">
+            <value>${jdbc.dbUser}</value>
+        </constructor-arg>
+        <constructor-arg index="3">
+            <value>${jdbc.dbPwd}</value>
+        </constructor-arg>
+        <constructor-arg index="4">
+            <value>${jdbc.dbPort}</value>
+        </constructor-arg>    
+    </bean>
+    
+    <!-- The following two beans are used for FI annotations -->
+    <bean id="fiAnnotator" class="org.reactome.r3.fi.InteractionAnnotator">
+        <property name="sourceDBA">
+            <ref bean="srcDBA" />
+        </property>
+        <property name="interactionDAO">
+            <ref bean="interactionDAO" />
+        </property>
+        <property name="fIWithAnnotationFile">
+            <value>${resources.dir}${fi.gene.annotation.file}</value>
+        </property>        
+        <property name="fIToSourceFile">
+            <value>${resources.dir}${fi.gene.pathway.sources.file}</value>
+        </property>
+    </bean>
+    
+    <bean id="goTermLoader" class="org.reactome.annotate.GOTermLoader">
+        <property name="goaFileName">
+            <value>${resources.dir}${goa.file.name}</value>
+        </property>
+        <property name="goTermIdFileName">
+            <value>${resources.dir}${go.term.id}</value>
+        </property>
+        <property name="proteinIdToNameFileName">
+            <value>${resources.dir}${protein.acc.to.name}</value>
+        </property>
+    </bean>
+    
+    <bean id="pathwayAnnotationHelper" class="org.reactome.annotate.AnnotationHelper">
+        <property name="geneFIFile">
+            <value>${resources.dir}${fi.gene.file}</value>
+        </property>
+        <property name="proteinNameToPathwayFile">
+            <value>${resources.dir}${name.to.pathways}</value>
+        </property>
+        <property name="proteinNameToReactomePathwayFile">
+            <value>${resources.dir}${name.to.reactome.pathways}</value>
+        </property>
+        <property name="reactionIdToPathwayFile">
+            <value>${resources.dir}${reactome.reaction.to.pathways}</value>
+        </property>
+        <property name="goTermLoader">
+            <ref bean="goTermLoader"></ref>
+        </property>
+    </bean>
+    
+    <bean id="pathwayAnnotator" class="org.reactome.annotate.PathwayBasedAnnotator">
+        <property name="annotationHelper">
+            <ref bean="pathwayAnnotationHelper"></ref>
+        </property>
+        <property name="useBenjaminiHochbergForFDR">
+            <value>true</value>
+        </property>
+    </bean>
+    
+    <bean id="networkBuilder" class="org.reactome.r3.graph.NetworkBuilderForGeneSet">
+        <property name="fiFileName">
+            <value>${resources.dir}${fi.gene.file}</value>
+        </property>
+        <!-- Use the following error will create an error in EdgeSorter class, which makes edge sorting impossible. Need to figure
+        out the problem! This config has been deleted in the actual deployment. -->
+<!--         <property name="pathwayFiGeneFileName"> -->
+<!--             <value>${resources.dir}${fi.pathway.gene.file}</value> -->
+<!--         </property> -->
+    </bean>
+    
+    <bean id="elvDba" class="org.gk.persistence.MySQLAdaptor">
+        <constructor-arg index="0">
+            <value>${jdbc.dbHost}</value>
+        </constructor-arg>
+        <constructor-arg index="1">
+            <value>${elv.dbName}</value>
+        </constructor-arg>
+        <constructor-arg index="2">
+            <value>${jdbc.dbUser}</value>
+        </constructor-arg>
+        <constructor-arg index="3">
+            <value>${jdbc.dbPwd}</value>
+        </constructor-arg>
+        <constructor-arg index="4">
+            <value>${jdbc.dbPort}</value>
+        </constructor-arg>    
+    </bean>
+    
+    <bean id="elvHandler" class="org.reactome.r3.fi.PathwayDiagramHandler">
+        <property name="diagramDBA">
+            <ref bean="elvDba" />
+        </property>
+<!--         <property name="dotPath"> -->
+<!--             <value>${dot}</value> -->
+<!--         </property> -->
+    </bean>
+    
+    <bean id="keggHelper" class="org.reactome.r3.fi.KEGGHelper">
+        <property name="hsaListFile">
+            <value>${resources.dir}${kegg.hsa.list}</value>
+        </property>
+        <property name="mapTitleFile">
+            <value>${resources.dir}${kegg.pathway.name.to.id}</value>
+        </property>
+    </bean>
+    
+    <!-- Used for R-based survival analysis -->
+    <bean id="suvivalAnalysisHelper" class="org.reactome.r3.fi.SurvivalAnalysisHelper">
+        <!-- Give an extra control -->
+        <property name="rScriptCommand">
+            <value>${r.script.command}</value>
+        </property>
+        <property name="rScript">
+            <value>${resources.dir}${survival.analysis.r.script}</value>
+        </property>
+        <property name="tempDirName">
+            <value>${survival.analysis.temp.dir}</value>
+        </property>
+    </bean>
+    
+    <bean id="mclHelper" class="org.reactome.r3.fi.MCLClusteringHelper">
+        <property name="tempDirName">
+            <value>${survival.analysis.temp.dir}</value>
+        </property>
+        <property name="mclScript">
+            <value>${resources.dir}${mcl.script}</value>
+        </property>
+    </bean>
+    
+    <bean id="hotNetHelper" class="org.reactome.r3.fi.HotNetAnalysisHelper">
+        <property name="fiFileName">
+            <value>${resources.dir}${fi.bigComp.gene.file}</value>
+        </property>
+        <property name="heatKernelFileName">
+            <value>${resources.dir}${heat.kernel.file}</value>
+        </property>
+    </bean>
+    
+    <bean id="pathwayToFIsConverter" class="org.reactome.r3.fi.PathwayToFIsConverter">
+        <property name="mySQLAdaptor">
+            <ref bean="srcDBA"></ref>
+        </property>
+        <property name="annotator">
+            <ref bean="fiAnnotator" />
+        </property>
+    </bean>
+    
+    <bean id="reactomeObjectHandler" class="org.reactome.r3.fi.ReactomeObjectHandler">
+        <property name="srcDBA">
+            <ref bean="srcDBA" />
+        </property>
+        <property name="pathwayListFileName">
+        		<value>${resources.dir}${reactome.pathway.list}</value>
+        </property>
+    </bean>
+    
+    <bean id="factorGraphHelper" class="org.reactome.r3.fi.FactorGraphFacade">
+    </bean>
+<!--     <bean id="encodeQuery" class="org.reactome.r3.fi.EncodeTFTargetInteractionQuery"> -->
+<!--         <property name="accToNameMapFile"> -->
+<!--             <value>${protein.acc.to.name}</value> -->
+<!--         </property> -->
+<!--         <property name="distalFileName"> -->
+<!--             <value>${encode.tf.target.distal}</value> -->
+<!--         </property> -->
+<!--         <property name="proximalFileName"> -->
+<!--             <value>${encode.tf.target.proximal}</value> -->
+<!--         </property> -->
+<!--     </bean> -->
+    
+    <bean id="rEngineWrapper" class="org.reactome.r3.fi.RengineWrapper"></bean>
+    
+    <!-- The following beans are related to Reactome RESTful API -->
+   <bean id="queryHelper" class="org.reactome.restfulapi.QueryHelper" />
+   
+   <bean id="postMapperFactory" class="org.reactome.restfulapi.ReactomeModelPostMapperFactory">
+        <property name="configuration">
+            <value>ReactomePostMapperConfiguration.xml</value>
+        </property>
+    </bean>
+    
+    <bean id="reactomeConverter" class="org.reactome.restfulapi.ReactomeToRESTfulAPIConverter">
+        <property name="postMapperFactory">
+            <ref bean="postMapperFactory" />
+        </property>
+    </bean>
+
+    <bean id="restHelper" class="org.reactome.restfulapi.APIControllerHelper">
+        <property name="queryHelper">
+            <ref bean="queryHelper"/>
+        </property>
+        <property name="converter">
+            <ref bean="reactomeConverter" />
+        </property>
+        <property name="dba">
+            <ref bean="srcDBA"/>
+        </property>
+        <!-- For all reactome servers -->
+<!--         <property name="outputdir" value="/tmp"></property> -->
+        <!-- For reactome production server -->
+<!--         <property name="outputdir" value="/usr/local/apache-tomcat/temp"></property> -->
+        <!-- Just use this temp directory -->
+        <property name="outputdir">
+            <value>${survival.analysis.temp.dir}</value>
+         </property>
+    </bean>
+    
+    <bean id="reactomeRest" class="org.reactome.r3.fi.ReactomeRESTAPI">
+        <property name="restHelper">
+            <ref bean="restHelper" />
+        </property>
+    </bean>
+    
+    <bean id="booleanNetworkConverter" class="org.reactome.pathway.booleannetwork.PathwayToBooleanNetworkConverter">
+    </bean>
+    
+    <bean id="fiNetworkResource" class="org.reactome.r3.fi.FINetworkResource">
+        <property name="fIAnnotator">
+            <ref bean="fiAnnotator" />
+        </property>
+         <property name="interactionService">
+            <ref bean="fileFIService" />
+        </property>      
+        <property name="hibernateDAO">
+            <ref bean="interactionDAO" />
+        </property> 
+        <property name="pathwayAnnotator">
+            <ref bean="pathwayAnnotator" />
+        </property>
+        <property name="networkBuilder">
+            <ref bean="networkBuilder" />
+        </property>
+        <property name="diagramHandler">
+            <ref bean="elvHandler" />
+        </property>
+        <property name="keggHelper">
+            <ref bean="keggHelper" />
+        </property>
+        <property name="networkBuildSizeCutoff">
+            <value>250</value>
+        </property>
+        <property name="survivalAnalysisHelper">
+            <ref bean="suvivalAnalysisHelper" />
+        </property>
+        <property name="mclHelper">
+            <ref bean="mclHelper" />
+        </property>
+        <property name="hotNetHelper">
+            <ref bean="hotNetHelper" />
+        </property>
+        <property name="pathwayToFIsConverter">
+            <ref bean="pathwayToFIsConverter" />
+        </property>
+        <property name="reactomeObjectHandler">
+            <ref bean="reactomeObjectHandler" />
+        </property>
+        <property name="factorGraphHelper">
+            <ref bean="factorGraphHelper" />
+        </property>
+        <property name="rEngineWrapper">
+            <ref bean="rEngineWrapper" />
+        </property>
+        <property name="booleanNetworkConverter">
+            <ref bean="booleanNetworkConverter" />
+        </property>
+<!--         <property name="encodeTFTargetQuery"> -->
+<!--             <ref bean="encodeQuery" /> -->
+<!--         </property> -->
+    </bean>
+    
+    <bean id="cgiDAO" class="org.reactome.r3.service.CancerGeneIndexDAO">
+        <property name="sessionFactory">
+            <ref bean="cgiSessionFactory" />
+        </property>
+    </bean>
+    
+    <bean id="cgiResource"  class="org.reactome.r3.fi.CancerGeneIndexResource">
+        <property name="dao">
+            <ref bean="cgiDAO" />
+        </property>
+    </bean>
+    
+    <!-- These configurations are used for interaction between cancer drugs and their targets -->
+    <bean id="cancerDruggabilitySF" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+        <property name="configLocation">
+            <value>/WEB-INF/drugHibernate.cfg.xml</value>
+    </property>
+    </bean>
+    
+    <bean id="cancerDruggabilityDAO" class="org.reactome.r3.service.CancerDruggabilityDAO">
+        <property name="sessionFactory">
+            <ref bean="cancerDruggabilitySF" />
+        </property>
+    </bean>
+    
+    <bean id="drugCentralDAO" class="org.reactome.r3.service.DrugCentralDAO">
+        <property name="fileName">
+            <value>${resources.dir}${drugcentral.file}</value>
+        </property>
+    </bean>
+    
+    <bean id="impactAnalyzer" class="org.reactome.r3.fi.PathwayDrugImpactAnalyzer">
+    		<property name="reactomeHandler">
+    			<ref bean="reactomeObjectHandler" />
+    		</property>
+    		<property name="converter">
+    			<ref bean="booleanNetworkConverter" />
+    		</property>
+    </bean>
+    
+    <bean id="cancerDruggabilityResource" class="org.reactome.r3.fi.CancerDruggabilityResource">
+        <property name="cancerDruggabilityDAO">
+            <ref bean="cancerDruggabilityDAO" />
+        </property>
+        <property name="drugCentralDAO">
+            <ref bean="drugCentralDAO" />
+        </property>
+        <property name="reactomeObjectHandler">
+            <ref bean="reactomeObjectHandler" />
+        </property>
+        <property name="impactAnalyzer">
+        		<ref bean="impactAnalyzer" />
+        </property>
+    </bean>
+    <!-- Output in XML format -->
+    <!-- jaxws:endpoint id="interactionServiceSOAPEndPoint" 
+        implementor="#interactionService"
+        address="/soap/Query">
+    </jaxws:endpoint -->
+
+</beans>

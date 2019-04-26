@@ -72,6 +72,33 @@ public class PathwayDrugImpactAnalyzer {
         return builder.toString();
     }
     
+    /**
+     * Perform a systematic pathway hit analysis for a specified drug. Currently it
+     * support one drug only.
+     * @param drug
+     * @return
+     */
+    public String performHitAnalysis(String drug, DrugDAO drugDAO) throws Exception {
+        List<GKInstance> pathways = reactomeHandler.loadPathwayList();
+        BNPerturbationAnalyzer analyzer = new BNPerturbationAnalyzer();
+        DrugToTargetsMapper mapper = getDrugTargetsMapper(drugDAO);
+        StringBuilder builder = new StringBuilder();
+        for (GKInstance pathway : pathways) {
+//            if (!pathway.getDBID().equals(8951664L))
+//                continue;
+            PathwayImpactAnalysisResult result = analyzer.performDrugHitAnalysis(pathway,
+                                                                converter,
+                                                                drug,
+                                                                mapper);
+            if (result != null) {
+                builder.append(result.getDbId() + "\t" + 
+                               result.getPathwayName() + "\t" + 
+                               String.join(",", result.getTargetGenes()) + "\n");
+            }
+        }
+        return builder.toString();
+    }
+    
     private DrugToTargetsMapper getDrugTargetsMapper(DrugDAO drugDAO) {
         DrugToTargetsMapper mapper = new DrugToTargetsMapper() {
             private DrugTargetInteractionTypeMapper typeMapper = new DrugTargetInteractionTypeMapper();
@@ -137,9 +164,7 @@ public class PathwayDrugImpactAnalyzer {
         if (interaction.getExpEvidenceSet() == null)
             return rtn;
         for (ExpEvidence evidence : interaction.getExpEvidenceSet()) {
-            if (evidence.getAssayValueMedian() == null ||
-                evidence.getAssayValueMedian().trim().length() == 0 ||
-                evidence.getAssayType() == null)
+            if (shouldFilterOut(evidence))
                 continue;
             Number current = evidence.getAssayValue();
             if (current == null)
@@ -148,6 +173,21 @@ public class PathwayDrugImpactAnalyzer {
                 rtn = current.doubleValue();
         }
         return rtn;
+    }
+    
+    /**
+     * Check if an ExpEvidence should not be used to get assay value.
+     * @param evidence
+     * @return
+     */
+    private boolean shouldFilterOut(ExpEvidence evidence) {
+        if (evidence.getAssayValueMedian() == null ||
+            evidence.getAssayValueMedian().trim().length() == 0 ||
+            evidence.getAssayType() == null)
+            return true; // This happens
+        if (evidence.getAssayRelation() != null && evidence.getAssayRelation().equals(">"))
+            return true; // Don't want to use ">" values.
+        return false;
     }
 
 }

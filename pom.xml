@@ -98,14 +98,16 @@
 		<!-- <version>2.1.1</version> -->
 		<!-- </dependency> -->
 		<!-- Servlet API -->
-		<!-- <dependency> -->
-		<!-- <groupId>javax.servlet</groupId> -->
-		<!-- <artifactId>javax.servlet-api</artifactId> -->
-		<!-- <version>2.5</version> -->
-		<!-- <scope>provided</scope> -->
-		<!-- </dependency> -->
-		<!-- Add this for linux distribution. It works fine without using this 
-			for some unknown reason under Mac OSX -->
+	<!-- https://mvnrepository.com/artifact/javax.servlet/servlet-api -->
+	<dependency>
+		<groupId>javax.servlet</groupId>
+		<artifactId>servlet-api</artifactId>
+		<version>2.5</version>
+		<scope>provided</scope>
+	</dependency>
+
+	<!-- Add this for linux distribution. It works fine without using this for 
+		some unknown reason under Mac OSX -->
 		<!-- <dependency> -->
 		<!-- <groupId>com.fasterxml.woodstox</groupId> -->
 		<!-- <artifactId>woodstox-core</artifactId> -->
@@ -262,6 +264,25 @@
 
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
+		<resources>
+			<resource>
+                <directory>src/main/java</directory>
+                <!-- Use the default, which should be the top-level class -->
+<!--                 <targetPath></targetPath> -->
+                <includes>
+                    <include>*.properties</include>
+                    <!-- Need to specify the exact file name. Otherwise, pom.xml will be copied. -->
+                    <include>ReactomePostMapperConfiguration.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/java/org/reactome/r3/fi</directory>
+                <targetPath>org/reactome/r3/fi</targetPath>
+                <includes>
+                    <include>InteractionTypeMapper.xml</include>
+                </includes>
+            </resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -284,5 +305,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		
+		<finalName>caBigR3WebApp2018</finalName>
 	</build>
 </project>

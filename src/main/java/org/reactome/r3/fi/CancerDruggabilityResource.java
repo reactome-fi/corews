@@ -197,6 +197,23 @@ public class CancerDruggabilityResource {
         String results = impactAnalyzer.performImpactAnalysis(drug, getDrugDAO(dataSource));
         return results;
     }
+    
+    /**
+     * This method is used to perform a pathway hit analysis for a drug based on a list of pathways.
+     * Use POST to avoid encoding drug names in URL.
+     * @param drug
+     * @return
+     * @throws Exception
+     */
+    @Path("/performHitAnalysis/{dataSource}")
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces({MediaType.TEXT_PLAIN})
+    public String performHitAnalysis(@PathParam("dataSource") String dataSource,
+                                      String drug) throws Exception {
+        String results = impactAnalyzer.performHitAnalysis(drug, getDrugDAO(dataSource));
+        return results;
+    }
 
     private List<String> grepGenesInPE(Long peId) throws Exception {
         String geneText = reactomeObjectHandler.getContainedGenesInPE(peId);

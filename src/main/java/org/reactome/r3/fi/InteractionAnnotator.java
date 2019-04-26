@@ -7,7 +7,17 @@ package org.reactome.r3.fi;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.gk.model.GKInstance;
@@ -503,7 +513,8 @@ public class InteractionAnnotator {
             }
             else if (src.getSourceType() == ReactomeSourceType.REACTION) {
                 String type = extractTypeFromReaction(src, interaction);
-                types.add(type);
+                for (String type1 : type.split(":"))
+                    types.add(type1);
             }
             else if (src.getSourceType() == ReactomeSourceType.TARGETED_INTERACTION) {
                 String type = extractTypeFromTargetedInteraction(src, interaction);
@@ -532,19 +543,28 @@ public class InteractionAnnotator {
         if (interaction.getFirstProtein().getShortName().equals(name2))
             needReverse = true;
         FIAnnotation fiType = null;
+        boolean isReaction = false;
         for (ReactomeSource src : sources) {
-            if (src.getSourceType() == ReactomeSourceType.COMPLEX)
+            isReaction = false;
+            if (src.getSourceType() == ReactomeSourceType.COMPLEX) {
                 fiType = nameToType.get("complex");
+            }
             else if (src.getSourceType() == ReactomeSourceType.INTERACTION) {
                 fiType = extractInteractionType(src, 
                                                 interaction,
                                                 needReverse);
             }
             else if (src.getSourceType() == ReactomeSourceType.REACTION) {
-                String type = extractTypeFromReaction(src, interaction);
-                fiType = nameToType.get(type);
-                if (fiType != null && needReverse)
-                    fiType = fiType.generateReverseType();
+                String types = extractTypeFromReaction(src, interaction);
+                String[] tokens = types.split(":");
+                for (String type : tokens) {
+                    fiType = nameToType.get(type);
+                    if (fiType != null && needReverse)
+                        fiType = fiType.generateReverseType();
+                    if (fiType != null)
+                        fiTypes.add(fiType);
+                }
+                isReaction = true;
             }
             else if (src.getSourceType() == ReactomeSourceType.TARGETED_INTERACTION) {
                 String type = extractTypeFromTargetedInteraction(src, interaction);
@@ -556,7 +576,8 @@ public class InteractionAnnotator {
                 logger.error(name1 + " " + name2 + " has no type!" + " Interaction: " + interaction.getDbId());
                 fiType = nameToType.get("unknown"); // Used as an error mark
             }
-            fiTypes.add(fiType);
+            if (!isReaction)
+                fiTypes.add(fiType);
         }
         return fiTypes;
     }
@@ -626,6 +647,12 @@ public class InteractionAnnotator {
     /**
      * Extract the FI type from a reaction. There are four types for a FI extracted from a
      * reaction: Input, Catalyze (Or Catalyzed), Inhibit (Inhibited), Activate (Activated).
+     * Two proteins may be invovled in multiple types of FIs (e.g. activation and catalysis) and
+     * sometimes may have conflict information (e.g. activation and inhibition together). The output
+     * from this method returns only one value in the first order: activate, inhibit, catalyze,
+     * activated by, inhibited by, catalyzed by, and input. 
+     * NOTE: the type is used for reference only!
+     * As of April 9, 2019, all types will be returned.
      * @param src
      * @param interaction
      * @return
@@ -656,24 +683,27 @@ public class InteractionAnnotator {
         Set<GKInstance> inhibitors = getRegulators(reaction, 
                                                    ReactomeJavaConstants.NegativeRegulation);
         Set<String> inhibitorIds = extractIds(inhibitors);
+        Set<String> rtn = new HashSet<>();
         // Generate the types
         if (activatorIds.contains(firstProteinId) && !activatorIds.contains(secondProteinId)) {
-            return "activate";
+            rtn.add("activate");
         }
         if (inhibitorIds.contains(firstProteinId) && !inhibitorIds.contains(secondProteinId))
-            return "inhibit";
+            rtn.add("inhibit");
         if (catalystIds.contains(firstProteinId) && inputIds.contains(secondProteinId))
-            return "catalyze";
+            rtn.add("catalyze");
         // Check the other direction
         if (activatorIds.contains(secondProteinId) && !activatorIds.contains(firstProteinId))
-            return "activated by";
+            rtn.add("activated by");
         if (inhibitorIds.contains(secondProteinId) && !inhibitorIds.contains(firstProteinId))
-            return "inhibited by";
+            rtn.add("inhibited by");
         if (catalystIds.contains(secondProteinId) && inputIds.contains(firstProteinId))
-            return "catalyzed by";
+            rtn.add("catalyzed by");
         if (inputIds.contains(firstProteinId) && inputIds.contains(secondProteinId))
-            return "input";
-        return "reaction"; // Cannot see the difference
+            rtn.add("input");
+        if (rtn.size() == 0)
+            rtn.add("reaction"); // Cannot see the difference
+        return rtn.stream().collect(Collectors.joining(":"));
     }
     
     /**
@@ -709,13 +739,13 @@ public class InteractionAnnotator {
     private Set<GKInstance> getRegulators(GKInstance reaction,
                                           String clsName) throws Exception {
         Set<GKInstance> regulators = new HashSet<GKInstance>();
-        Collection regulations = reaction.getReferers(ReactomeJavaConstants.regulatedEntity);
+        Collection<GKInstance> regulations = InstanceUtilities.getRegulations(reaction);
         if (regulations != null) {
-            for (Iterator it1 = regulations.iterator(); it1.hasNext();) {
+            for (Iterator<GKInstance> it1 = regulations.iterator(); it1.hasNext();) {
                 GKInstance regulation = (GKInstance) it1.next();
                 if (regulation.getSchemClass().isa(clsName)) {
-                    List list = regulation.getAttributeValuesList(ReactomeJavaConstants.regulator);
-                    for (Iterator it2 = list.iterator(); it2.hasNext();) {
+                    List<GKInstance> list = regulation.getAttributeValuesList(ReactomeJavaConstants.regulator);
+                    for (Iterator<GKInstance> it2 = list.iterator(); it2.hasNext();) {
                         GKInstance tmp = (GKInstance) it2.next();
                         if (tmp.getSchemClass().isa(ReactomeJavaConstants.PhysicalEntity))
                             regulators.add(tmp);
@@ -933,7 +963,9 @@ public class InteractionAnnotator {
         
         // The following running are based on configuration in the FINetworkBuild project, which
         // should work for all versions.
-        String fiNetworkBuildDir = "/Users/wug/Documents/eclipse_workspace/FINetworkBuild/";
+//        String fiNetworkBuildDir = "/Users/wug/Documents/eclipse_workspace/FINetworkBuild/";
+        // Since 2018, FINetworkBuild project has been migrated to GitHub
+        String fiNetworkBuildDir = "/Users/wug/git/FINetworkBuild/";
         String resourceDir = fiNetworkBuildDir + "resources/";
         String configFile = resourceDir + "configuration.prop";
         Properties config = new Properties();
@@ -977,15 +1009,17 @@ public class InteractionAnnotator {
         // The following FI doesn't appear in 2015. So the following code is commented out!
 //        String fi = "TRAPPC2P1\tZBTB33";
         // Error in 2016 version of the FI network.
-        String fi = "BRCA1\tTRAPPC2B"; 
-        fi = "CBSL\tUSF2";
+//        String fi = "BRCA1\tTRAPPC2B"; 
+//        fi = "CBSL\tUSF2";
 //        fi = "FOS\tHSPA1B";
 //        fi = "HSPA1B\tNFIC";
 //        fi = "HSPA1B\tTFAP2A";
 //        fi = "TRAPPC2B\tZBTB33";
         // Errors in 2017 version of the FI network. Copy annotation from previous year.
-        String[] genes = fi.split("\t");
-        FIAnnotation fiAnnot = annotate(genes[0], genes[1]);
+        // Test for 2018
+//        fi = "AAAS\tSLU7";
+//        String[] genes = fi.split("\t");
+//        FIAnnotation fiAnnot = annotate(genes[0], genes[1]);
 //        String text = String.format("%s\t%s\t%s\t%.2f",
 //                                       fi,
 //                                       fiAnnot.getAnnotation(),

@@ -215,9 +215,6 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
         <property name="srcDBA">
             <ref bean="srcDBA" />
         </property>
-        <property name="pathwayListFileName">
-        		<value>${resources.dir}${reactome.pathway.list}</value>
-        </property>
     </bean>
     
     <bean id="factorGraphHelper" class="org.reactome.r3.fi.FactorGraphFacade">

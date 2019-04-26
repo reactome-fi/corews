@@ -4,8 +4,6 @@
  */
 package org.reactome.r3.fi;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,8 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -46,39 +42,56 @@ import org.reactome.r3.util.InteractionUtilities;
  */
 public class ReactomeObjectHandler {
     private MySQLAdaptor srcDBA;
-    private String pathwayListFileName;
+    // Caches this list to avoid repeated query
+    private Set<Long> pathwayDBIDs;
     
     /**
      * Default constructor.
      */
     public ReactomeObjectHandler() {
     }
-
-    public String getPathwayListFileName() {
-        return pathwayListFileName;
-    }
-
-    public void setPathwayListFileName(String pathwayListFileName) {
-        this.pathwayListFileName = pathwayListFileName;
-    }
     
     /**
-     * Load a pre-populated pathways, which usually should have ELV diagrams available.
+     * Load a list of pathways that are subject to pathway impact analysis. These pathways should have ELV diagrams available.
      * @return
      * @throws Exception
      */
     public List<GKInstance> loadPathwayList() throws Exception {
-        if (pathwayListFileName == null)
-            return new ArrayList<>();
-        try (Stream<String> stream = Files.lines(Paths.get(pathwayListFileName))) {
-            List<Long> dbIds = stream.map(line -> new Long(line.split("\t")[0])).collect(Collectors.toList());
-            List<GKInstance> pathways = new ArrayList<>();
-            for (Long dbId : dbIds) {
-                GKInstance pathway = srcDBA.fetchInstance(dbId);
-                if (pathway != null)
-                    pathways.add(pathway);
+        if (pathwayDBIDs == null)
+            loadPathwayDBIDs();
+        List<GKInstance> pathways = new ArrayList<>();
+        for (Long dbId : pathwayDBIDs) {
+            GKInstance pathway = srcDBA.fetchInstance(dbId);
+            if (pathway != null)
+                pathways.add(pathway);
+        }
+        return pathways;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void loadPathwayDBIDs() throws Exception {
+        Collection<GKInstance> diagrams = srcDBA.fetchInstancesByClass(ReactomeJavaConstants.PathwayDiagram);
+        DiagramGKBReader reader = new DiagramGKBReader();
+        pathwayDBIDs = new HashSet<>();
+        for (GKInstance diagram : diagrams) {
+            boolean hasELV = false;
+            RenderablePathway pathway = reader.openDiagram(diagram);
+            List<Renderable> components = pathway.getComponents();
+            if (components != null) {
+                for (Renderable r : components) {
+                    if (r.getReactomeId() == null)
+                        continue;
+                    GKInstance inst = srcDBA.fetchInstance(r.getReactomeId());
+                    if (inst.getSchemClass().isa(ReactomeJavaConstants.PhysicalEntity)) {
+                        hasELV = true;
+                        break;
+                    }
+                }
             }
-            return pathways;
+            if (hasELV) {
+                GKInstance inst = (GKInstance) diagram.getAttributeValue(ReactomeJavaConstants.representedPathway);
+                pathwayDBIDs.add(inst.getDBID());
+            }
         }
     }
 
@@ -131,6 +144,8 @@ public class ReactomeObjectHandler {
             rtn.addAttribute(rAtt);
         }
         // For Reaction, we want to know its regulations too
+        // As of version 2018, the following is not needed. The above for loop should also handle
+        // regulatedBy now.
         if (instance.getSchemClass().isa(ReactomeJavaConstants.ReactionlikeEvent)) {
             @SuppressWarnings("unchecked")
             Collection<GKInstance> regulations = instance.getReferers(ReactomeJavaConstants.regulatedEntity);

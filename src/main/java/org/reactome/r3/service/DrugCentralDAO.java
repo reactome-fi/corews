@@ -10,9 +10,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
+import org.junit.Test;
 
 import edu.ohsu.bcb.druggability.dataModel.Drug;
 import edu.ohsu.bcb.druggability.dataModel.Interaction;
+import edu.ohsu.bcb.druggability.dataModel.Target;
 
 /**
  * This class is used to load DrugCentral drug/target interactions directly
@@ -97,6 +99,17 @@ public class DrugCentralDAO implements DrugDAO {
                 .filter(i -> drugs.contains(i.getIntDrug().getDrugName()))
                 .collect(Collectors.toList());
         return rtn;
+    }
+    
+    @Test
+    public void checkNumbers() throws Exception {
+        fileName = "src/main/webapp/WEB-INF/drug.target.interaction.08292017.tsv";
+        loadInteractions();
+        List<Drug> drugs = listDrugs();
+        System.out.println("Total drugs: " + drugs.size());
+        System.out.println("Total interactions: " + interactions.size());
+        Set<Target> targets = interactions.stream().map(Interaction::getIntTarget).collect(Collectors.toSet());
+        System.out.println("Total targets: " + targets.size());
     }
     
 }

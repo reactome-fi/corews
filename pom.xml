@@ -279,7 +279,7 @@
                 <directory>src/main/java/org/reactome/r3/fi</directory>
                 <targetPath>org/reactome/r3/fi</targetPath>
                 <includes>
-                    <include>InteractionTypeMapper.xml</include>
+                    <include>*.xml</include>
                 </includes>
             </resource>
 		</resources>

@@ -107,7 +107,7 @@ public class PathwayDrugImpactAnalyzer {
             public Set<String> getDrugTargets(String drug) throws Exception {
                 List<Interaction> interactions = drugDAO.queryInteractionsForDrugs(new String[]{drug});
                 return interactions.stream()
-                                   .filter(i -> getMinValue(i) != null)
+                                   .filter(i -> i.getMinAssayValue() != null)
                                    .map(i -> i.getIntTarget().getTargetName())
                                    .filter(name -> (name != null))
                                    .collect(Collectors.toSet());
@@ -119,7 +119,8 @@ public class PathwayDrugImpactAnalyzer {
                 Map<String, Double> geneToValue = new HashMap<>();
                 AffinityToModificationMap affToModMap = new DefaultAffinityToModificationMap();
                 interactions.forEach(interaction -> {
-                    Double minValue = getMinValue(interaction);
+                    Double rtn = interaction.getMinAssayValue();
+                    Double minValue = rtn;
                     if (minValue == null)
                         return;
                     ModificationType type = typeMapper.getModificationType(interaction.getInteractionType());
@@ -138,7 +139,7 @@ public class PathwayDrugImpactAnalyzer {
                 Map<String, Double> geneToValue = new HashMap<>();
                 AffinityToModificationMap affToModMap = new DefaultAffinityToModificationMap();
                 interactions.forEach(interaction -> {
-                    Double minValue = getMinValue(interaction);
+                    Double minValue = interaction.getMinAssayValue();
                     if (minValue == null)
                         return;
                     ModificationType type = typeMapper.getModificationType(interaction.getInteractionType());
@@ -153,41 +154,4 @@ public class PathwayDrugImpactAnalyzer {
         };
         return mapper;
     }
-    
-    /**
-     * Use this method to pick up whatever type of minimum value
-     * @param interaction
-     * @return
-     */
-    private Double getMinValue(Interaction interaction) {
-        Double rtn = null;
-        if (interaction.getExpEvidenceSet() == null)
-            return rtn;
-        for (ExpEvidence evidence : interaction.getExpEvidenceSet()) {
-            if (shouldFilterOut(evidence))
-                continue;
-            Number current = evidence.getAssayValue();
-            if (current == null)
-                continue;
-            if (rtn == null || current.doubleValue() < rtn.doubleValue())
-                rtn = current.doubleValue();
-        }
-        return rtn;
-    }
-    
-    /**
-     * Check if an ExpEvidence should not be used to get assay value.
-     * @param evidence
-     * @return
-     */
-    private boolean shouldFilterOut(ExpEvidence evidence) {
-        if (evidence.getAssayValueMedian() == null ||
-            evidence.getAssayValueMedian().trim().length() == 0 ||
-            evidence.getAssayType() == null)
-            return true; // This happens
-        if (evidence.getAssayRelation() != null && evidence.getAssayRelation().equals(">"))
-            return true; // Don't want to use ">" values.
-        return false;
-    }
-
 }

@@ -180,15 +180,17 @@ public class PathwayToFIsConverter {
                                      instToProtein,
                                      idToSourceMap);
             }
-            else if (inst.getSchemClass().isa(ReactomeJavaConstants.Pathway)) {
-                extractFIsFromPathway(inst,
-                                      reactomeAnalyzer, 
-                                      topicHelper, 
-                                      true, // true should be used in order to map converted FIs in the Cytoscape back to the displayed pathway diagrams.
-                                      pairToInteractionMap,
-                                      instToProtein,
-                                      idToSourceMap);
-            }
+            // As of September 23, 2019, this converting is turned off to control the size of the final
+            // converted FI network and make the annotation more reliable.
+//            else if (inst.getSchemClass().isa(ReactomeJavaConstants.Pathway)) {
+//                extractFIsFromPathway(inst,
+//                                      reactomeAnalyzer, 
+//                                      topicHelper, 
+//                                      true, // true should be used in order to map converted FIs in the Cytoscape back to the displayed pathway diagrams.
+//                                      pairToInteractionMap,
+//                                      instToProtein,
+//                                      idToSourceMap);
+//            }
         }
     }
 
@@ -374,7 +376,11 @@ public class PathwayToFIsConverter {
             return protein;
         protein = new Protein();
         // Only protein name is needed in this conversion
-        String name = (String) refGeneProduct.getAttributeValue(ReactomeJavaConstants.name);
+        String name = null;
+        if (refGeneProduct.getSchemClass().isValidAttribute(ReactomeJavaConstants.geneName))
+            name = (String) refGeneProduct.getAttributeValue(ReactomeJavaConstants.geneName);
+        if (name == null || name.length() == 0)
+            name = (String) refGeneProduct.getAttributeValue(ReactomeJavaConstants.name);
         protein.setShortName(name);
         String accession = (String) refGeneProduct.getAttributeValue(ReactomeJavaConstants.identifier);
         protein.setPrimaryAccession(accession);
@@ -387,7 +393,7 @@ public class PathwayToFIsConverter {
     @Test
     public void testConvertPathwayToFIs() throws Exception {
         MySQLAdaptor dba = new MySQLAdaptor("localhost",
-                                            "reactome_47_plus_i",
+                                            "reactome_67_plus_i",
                                             "root",
                                             "macmysql01");
         setMySQLAdaptor(dba);

@@ -189,10 +189,24 @@ public class CancerDruggabilityDAO extends HibernateDaoSupport implements DrugDA
     
     @Test
     public void testQueryInteractions() {
-        String configFileName = "WebContent/WEB-INF/drugHibernate.cfg.xml";
+        String configFileName = "src/main/webapp/WEB-INF/drugHibernate.cfg.xml";
         Configuration configuration = new Configuration().configure(new File(configFileName));
         SessionFactory sf = configuration.buildSessionFactory();
         setSessionFactory(sf);
+        
+        Session session = sf.openSession();
+        
+        List<Drug> drugs = session.createQuery("FROM Drug").list();
+        System.out.println("Total drugs: " + drugs.size());
+        List<Target> targets = session.createQuery("FROM Target").list();
+        System.out.println("Total targets: " + targets.size());
+        List<Interaction> allInteractions = session.createQuery("FROM Interaction").list();
+        System.out.println("Total interactions: " + allInteractions.size());
+        
+        session.close();
+        
+        if (true)
+            return;
         
         Set<String> genes = new HashSet<String>();
         genes.add("EGFR");

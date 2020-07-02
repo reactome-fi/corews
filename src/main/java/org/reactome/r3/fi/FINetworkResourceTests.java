@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,8 +39,10 @@ import org.junit.Test;
  *
  */
 public class FINetworkResourceTests {
-    private final String HOST_URL = "http://localhost:8080/caBigR3WebApp/FIService";
-//    private final String HOST_URL = "http://reactomews.oicr.on.ca:8080/caBigR3WebApp2016/FIService";
+//    private final String HOST_URL = "http://localhost:8080/caBigR3WebApp/FIService";
+    private final String HOST_URL = "http://localhost:8080/corews/FIService";
+//    private final String HOST_URL = "http://cpws.reactome.org/caBigR3WebApp2019/FIService";
+//    private final String HOST_URL = "http://54.236.18.108/corews/FIService";
     private final String NETWORK_URL = HOST_URL + "/network/";
     private final String DRUG_URL = HOST_URL + "/drug/";
 //    private String drugDataSource = "targetome";
@@ -50,6 +54,34 @@ public class FINetworkResourceTests {
     private final String HTTP_GET = "Get";
     
     public FINetworkResourceTests() {
+    }
+    
+    @Test
+    public void testCluster() throws Exception {
+        String fileName = "/Users/wug/Desktop/test.txt";
+        String url = NETWORK_URL + "cluster";
+        StringBuilder builder = new StringBuilder();
+        Files.lines(Paths.get(fileName))
+        .forEach(line -> {
+            String[] tokens = line.split("\t");
+            if (tokens.length != 3) {
+                System.out.println(line);
+                return;
+            }
+            builder.append(tokens[0]).append("\t");
+            int compare = tokens[1].compareTo(tokens[2]);
+            if (compare < 0) {
+                builder.append(tokens[1]).append("\t");
+                builder.append(tokens[2]).append("\n");
+            }
+            else {
+                builder.append(tokens[2]).append("\t");
+                builder.append(tokens[1]).append("\n");
+            }
+        });
+        System.out.println(builder.toString());
+        String result = callHttp(url, HTTP_POST, builder.toString());
+        System.out.println(result);
     }
     
     @Test
@@ -101,7 +133,8 @@ public class FINetworkResourceTests {
     
     @Test
     public void testConvertPathwayToFIs() throws Exception {
-        String url = NETWORK_URL + "convertPathwayToFIs/69620";
+        String url = NETWORK_URL + "convertPathwayToFIs/8878159";
+        System.out.println(url);
         String text = callHttp(url, HTTP_GET, "");
         prettyPrintXML(text);
     }
@@ -188,6 +221,14 @@ public class FINetworkResourceTests {
         query.append("\nCDC25A\tCHEK2");
         String text = callHttp(url, HTTP_POST, query.toString());
         prettyPrintXML(text);
+    }
+    
+    @Test
+    public void tetsGetMouseToHumanGeneMap() throws Exception {
+        String url = NETWORK_URL + "mouse2HumanGeneMap";
+        System.out.println("URL : " + url);
+        String text = callHttp(url, HTTP_GET, null);
+        System.out.println(text);
     }
     
     @Test

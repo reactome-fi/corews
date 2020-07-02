@@ -4,6 +4,7 @@
  */
 package org.reactome.r3.fi;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -82,10 +83,20 @@ public class FINetworkResource {
     private RengineWrapper rEngineWrapper;
     // For converting to pathways to boolean networks
     private PathwayToBooleanNetworkConverter bnConverter;
+    // For human mouse gene mapper
+    private HumanMouseGeneMapper humanMouseGeneMapper;
     
     public FINetworkResource() {
     }
     
+    public HumanMouseGeneMapper getHumanMouseGeneMapper() {
+        return humanMouseGeneMapper;
+    }
+
+    public void setHumanMouseGeneMapper(HumanMouseGeneMapper humanMouseGeneMapper) {
+        this.humanMouseGeneMapper = humanMouseGeneMapper;
+    }
+
     public void setBooleanNetworkConverter(PathwayToBooleanNetworkConverter converter) {
         this.bnConverter = converter;
     }
@@ -192,6 +203,24 @@ public class FINetworkResource {
 
     public void setPathwayToFIsConverter(PathwayToFIsConverter pathwayToFIConverter) {
         this.pathwayToFIsConverter = pathwayToFIConverter;
+    }
+    
+    @Path("mouse2HumanGeneMap")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getMouseToHumaGeneMap() {
+        try {
+            Map<String, Set<String>> map = humanMouseGeneMapper.getMouseToHumanMap();
+            StringBuilder builder = new StringBuilder();
+            map.forEach((key, set) -> {
+                set.forEach(hg -> builder.append(key + "\t" + hg + "\n"));
+            });
+            return builder.toString();
+        }
+        catch(IOException e) {
+            logger.error(e.getMessage(), e);
+            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @Path("/encodeTFTarget/query/{accession}")
@@ -706,7 +735,8 @@ public class FINetworkResource {
     
     /**
      * This method is used to cluster a FI network based on Spectral based network clustering
-     * algorithm.
+     * algorithm. Make sure FIs in the query text should be order alphabetically as the following:
+     * gene1\tgene2\ngene2\tgene3. Gene1 should be alalphatiecaly lower than gene2.
      * @param queryFIs
      * @return
      */

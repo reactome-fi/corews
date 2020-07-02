@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.log4j.Logger;
 import org.gk.model.GKInstance;
 import org.reactome.pathway.booleannetwork.AffinityToModificationMap;
 import org.reactome.pathway.booleannetwork.BNPerturbationAnalyzer;
@@ -19,6 +18,7 @@ import org.reactome.pathway.booleannetwork.PathwayImpactAnalysisResult;
 import org.reactome.pathway.booleannetwork.PathwayToBooleanNetworkConverter;
 import org.reactome.r3.service.DrugDAO;
 
+import edu.ohsu.bcb.druggability.dataModel.ExpEvidence;
 import edu.ohsu.bcb.druggability.dataModel.Interaction;
 import edu.ohsu.bcb.druggability.dataModel.Target;
 
@@ -28,7 +28,6 @@ import edu.ohsu.bcb.druggability.dataModel.Target;
  *
  */
 public class PathwayDrugImpactAnalyzer {
-    private static final Logger logger = Logger.getLogger(PathwayDrugImpactAnalyzer.class);
     private ReactomeObjectHandler reactomeHandler;
     private PathwayToBooleanNetworkConverter converter;
     
@@ -63,17 +62,12 @@ public class PathwayDrugImpactAnalyzer {
         DrugToTargetsMapper mapper = getDrugTargetsMapper(drugDAO);
         StringBuilder builder = new StringBuilder();
         for (GKInstance pathway : pathways) {
-            try {
-                PathwayImpactAnalysisResult results = analyzer.performDrugImpactAnalysis(pathway,
-                                                                                         converter,
-                                                                                         drug,
-                                                                                         mapper);
-                if (results != null)
-                    builder.append(results.toString()).append("\n");
-            }
-            catch(IllegalStateException e) {
-                logger.error("Error in " + pathway.toString(), e);
-            }
+            PathwayImpactAnalysisResult results = analyzer.performDrugImpactAnalysis(pathway,
+                                                                converter,
+                                                                drug,
+                                                                mapper);
+            if (results != null)
+                builder.append(results.toString()).append("\n");
         }
         return builder.toString();
     }

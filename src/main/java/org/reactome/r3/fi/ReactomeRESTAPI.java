@@ -7,6 +7,7 @@ package org.reactome.r3.fi;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -105,12 +106,8 @@ public class ReactomeRESTAPI {
     @Produces(MediaType.TEXT_PLAIN)
     public String getContainedEventIds(@PathParam("dbId") Long pathwayId) {
         List<Long> dbIds = restHelper.getContainedEventIds(pathwayId);
-        StringBuilder builder = new StringBuilder();
-        for (Long dbId : dbIds) {
-            builder.append(dbId).append(",");
-        }
-        builder.delete(builder.length() - 1, builder.length());
-        return builder.toString();
+        String rtn = dbIds.stream().map(id -> id.toString()).collect(Collectors.joining(","));
+        return rtn;
     }
     
     /**

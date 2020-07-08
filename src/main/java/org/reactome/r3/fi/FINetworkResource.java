@@ -5,6 +5,7 @@
 package org.reactome.r3.fi;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -840,17 +841,23 @@ public class FINetworkResource {
      * @param query
      * @return
      */
-    @Path("/annotateGeneSetWithReactomePathways")
+    @Path("/annotateGeneSetWithReactomePathways/{species}")
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<ModuleGeneSetAnnotation> annotateGeneSetWithReactomePathways(String query) {
+    public List<ModuleGeneSetAnnotation> annotateGeneSetWithReactomePathways(String query,
+                                                                             @PathParam("species") String species) {
         Set<String> geneSet = new HashSet<String>();
         String[] lines = query.split("\n");
         for (String line : lines)
             geneSet.add(line);
         try {
-            List<GeneSetAnnotation> annotations = pathwayAnnotator.annotateGenesWithReactomePathways(geneSet);
+            String decoded = URLDecoder.decode(species, "utf-8");
+            List<GeneSetAnnotation> annotations = null;
+            if (decoded.equals("Mus musculus"))
+                annotations = pathwayAnnotator.annotateMouseGenesWithReactomePathways(geneSet);
+            else 
+                annotations = pathwayAnnotator.annotateGenesWithReactomePathways(geneSet);
             ModuleGeneSetAnnotation moduleAnnotation = new ModuleGeneSetAnnotation();
             moduleAnnotation.setAnnotations(annotations);
             moduleAnnotation.setIds(geneSet);

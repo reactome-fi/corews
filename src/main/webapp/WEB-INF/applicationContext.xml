@@ -12,7 +12,10 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml" / -->
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location">
-            <value>WEB-INF/config.prop</value>
+<!--             <value>WEB-INF/reactomews2019.config.prop</value> -->
+<!--             <value>WEB-INF/config.prop</value> -->
+            <!-- Configuration for the mouse pathways -->
+            <value>WEB-INF/config.mouse.prop</value>
         </property>
     </bean>
     
@@ -105,6 +108,9 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
         </property>
         <property name="proteinNameToReactomePathwayFile">
             <value>${resources.dir}${name.to.reactome.pathways}</value>
+        </property>
+        <property name="mouseGeneToPathwayFile">
+        	<value>${resources.dir}${mouse.name.to.reactome.pathways}</value>
         </property>
         <property name="reactionIdToPathwayFile">
             <value>${resources.dir}${reactome.reaction.to.pathways}</value>
@@ -277,6 +283,12 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     <bean id="booleanNetworkConverter" class="org.reactome.pathway.booleannetwork.PathwayToBooleanNetworkConverter">
     </bean>
     
+    <bean id="humanMouseGeneMapper" class="org.reactome.r3.fi.HumanMouseGeneMapper">
+    	<property name="mapFileName">
+    		<value>${resources.dir}${mouse.human.gene.map}</value>
+    	</property>
+    </bean>
+    
     <bean id="fiNetworkResource" class="org.reactome.r3.fi.FINetworkResource">
         <property name="fIAnnotator">
             <ref bean="fiAnnotator" />
@@ -325,6 +337,9 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
         </property>
         <property name="booleanNetworkConverter">
             <ref bean="booleanNetworkConverter" />
+        </property>
+        <property name="humanMouseGeneMapper">
+        	<ref bean="humanMouseGeneMapper" />
         </property>
 <!--         <property name="encodeTFTargetQuery"> -->
 <!--             <ref bean="encodeQuery" /> -->

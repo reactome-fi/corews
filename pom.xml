@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.reactome.fi</groupId>
 	<artifactId>corews</artifactId>
-	<version>v1</version>
+	<version>1.0.0</version>
 	<packaging>war</packaging>
 
 	<!-- The following is based on https://www.boraji.com/how-to-create-a-web-project-using-maven-in-eclipse 
@@ -133,12 +133,6 @@
 <!-- 			<artifactId>caBIGR3</artifactId> -->
 <!-- 			<version>1.0</version> -->
 <!-- 		</dependency> -->
-		
-		<dependency>
-			<groupId>org.reactome.fi</groupId>
-			<artifactId>foundation</artifactId>
-			<version>1.0.0</version>
-		</dependency>
 		
 		<dependency>
 			<groupId>org.reactome.fi</groupId>
@@ -271,8 +265,6 @@
 			<version>3.0.2.RELEASE</version>
 		</dependency>
 
-
-
 	</dependencies>
 
 	<build>
@@ -314,7 +306,7 @@
 				<artifactId>tomcat7-maven-plugin</artifactId>
 				<version>2.2</version>
 				<configuration>
-					<path>/</path>
+					<path>/corews</path>
 					<port>8080</port>
 				</configuration>
 			</plugin>

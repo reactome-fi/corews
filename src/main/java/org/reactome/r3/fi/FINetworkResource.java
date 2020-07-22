@@ -555,7 +555,7 @@ public class FINetworkResource {
     }
     
     /**
-     * Get a list of gene to PE ids for a pathway specified by its DB_ID.
+     * Get a list of gene to PE ids for a pathway diagram specified by its DB_ID.
      * @param annotator
      */
     @Path("/getGeneToIdsInPathwayDiagram/{pathwayDiagramId}")
@@ -565,6 +565,20 @@ public class FINetworkResource {
         if (reactomeObjectHandler == null)
             return new ArrayList<ReactomeObjectHandler.GeneToPEIds>();
         return reactomeObjectHandler.getGeneToIdsInPathwayDiagram(pathwayDiagramId);
+    }
+    
+    /**
+     * Get a list of gene to PE ids for a pathway specified by its DB_ID. This method is used to map genes to
+     * ids drawn in a pathway digram. It is not really for the actual pathway!
+     * @param annotator
+     */
+    @Path("/getGeneToIdsInPathway/{pathwayId}")
+    @GET
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<GeneToPEIds> getGeneToIdsInPathway(@PathParam("pathwayId") Long pathwayId) throws Exception {
+        if (reactomeObjectHandler == null)
+            return new ArrayList<ReactomeObjectHandler.GeneToPEIds>();
+        return reactomeObjectHandler.getGeneToIdsInPathway(pathwayId);
     }
     
     /**

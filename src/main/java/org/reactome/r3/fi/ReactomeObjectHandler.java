@@ -201,6 +201,24 @@ public class ReactomeObjectHandler {
     }
     
     /**
+     * Get a map from gene names to instance DB_IDs for a pathway specified by its DB_ID. This method works
+     * for pathways having PathwayDiagram associated only.
+     * @param pathwayId
+     * @return
+     * @throws Exception
+     */
+    public List<GeneToPEIds> getGeneToIdsInPathway(Long pathwayId) throws Exception {
+        GKInstance pathway = srcDBA.fetchInstance(pathwayId);
+        if (pathway == null)
+            return new ArrayList<>();
+        @SuppressWarnings("unchecked")
+        Collection<GKInstance> diagrams = pathway.getReferers(ReactomeJavaConstants.representedPathway);
+        if (diagrams == null || diagrams.size() == 0)
+            return new ArrayList<>();
+        return getGeneToIdsInPathwayDiagram(diagrams.stream().findFirst().get().getDBID());
+    }
+    
+    /**
      * Get a map from gene names to instance DB_Ids for a PathwayDiagram specified by its DB_ID.
      * @param pathwayDiagramId
      * @return

@@ -1,113 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<web-app xmlns="http://java.sun.com/xml/ns/j2ee" 
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-		xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee 
-                            http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" 
-		version="2.4">
-<!-- START SNIPPET: xfire -->
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>/WEB-INF/applicationContext.xml</param-value>
-    </context-param>
-    <!-- Need to use false to avoid the unique webAppRootKey problem -->
-     <context-param>
-        <param-name>log4jExposeWebAppRoot</param-name>
-        <param-value>false</param-value>
-    </context-param>
-    
-    <context-param>
-        <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-        <param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
-    </context-param>
-    
-    <context-param>
-        <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
-        <param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
-    </context-param>
-    
-    <!-- Comment the following two elements out to enable logging during developing. But
-         these two elements should be commented out for deployment. Why? -->
-    <!-- context-param>
-        <param-name>log4jConfigLocation</param-name>
-        <param-value>/WEB-INF/log4j.properties</param-value>
-    </context-param -->
+<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+	                    http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	<!-- START SNIPPET: xfire -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/applicationContext.xml</param-value>
+	</context-param>
+	<!-- Need to use false to avoid the unique webAppRootKey problem -->
+	<context-param>
+		<param-name>log4jExposeWebAppRoot</param-name>
+		<param-value>false</param-value>
+	</context-param>
 
-    <listener>
-        <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
-    </listener>
+	<context-param>
+		<param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
+		<param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
+	</context-param>
 
-    <listener>
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-    </listener>
+	<context-param>
+		<param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
+		<param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
+	</context-param>
 
-    <servlet>
-        <servlet-name>ReactionDiagram</servlet-name>
-        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    </servlet>
+	<!-- Comment the following two elements out to enable logging during developing. But these two elements should be commented out for deployment. Why? -->
+	<!-- context-param> <param-name>log4jConfigLocation</param-name> <param-value>/WEB-INF/log4j.properties</param-value></context-param> -->
 
-    <!-- servlet>
-        <servlet-name>CXFServlet</servlet-name>
-        <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet -->
-    
-    <!-- servlet-mapping>
-        <servlet-name>CXFServlet</servlet-name>
-        <Need this * to make servlet mapping correct!!!>
-        <url-pattern>/FIService/*</url-pattern>
-    </servlet-mapping -->
-    
-    <!--  Add a filter to control keep session open in one request/response cycle -->
-    <filter>
-        <filter-name>sessionFilter</filter-name>
-        <filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>sessionFilter</filter-name>
-        <url-pattern>/FIService/*</url-pattern>
-    </filter-mapping>
-    
-    <welcome-file-list>
-        <welcome-file>FIView.html</welcome-file>
-    </welcome-file-list>
-<!-- END SNIPPET: xfire -->
+	<listener>
+		<listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+	</listener>
 
-    <servlet-mapping>
-        <servlet-name>ReactionDiagram</servlet-name>
-        <url-pattern>/reactomeService</url-pattern>
-    </servlet-mapping>
-    
-    <servlet-mapping>
-        <servlet-name>ReactionDiagram</servlet-name>
-        <url-pattern>/queryFileUpload</url-pattern>
-    </servlet-mapping>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
 
-    <servlet>
-        <servlet-name>FIService</servlet-name>
-        <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
-        <!-- servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class -->
-        <!-- init-param> <param-name>com.sun.jersey.config.property.packages</param-name> 
-            <param-value>org.reactome.r3.fi</param-value> </init-param -->
-        <init-param>
-            <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-            <param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
-        </init-param>
-        <init-param>
-            <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
-            <param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
-        </init-param>
-        <init-param>
-            <param-name>com.sun.jersey.config.feature.logging.DisableEntitylogging</param-name>
-            <param-value>true</param-value>
-        </init-param>
-        
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-    
-    <servlet-mapping>
-        <servlet-name>FIService</servlet-name>
-        <url-pattern>/FIService/*</url-pattern>
-    </servlet-mapping>
+	<servlet>
+		<servlet-name>ReactionDiagram</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+	</servlet>
+
+	<!-- servlet> <servlet-name>CXFServlet</servlet-name> <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class> 
+		<load-on-startup>1</load-on-startup> </servlet -->
+
+	<!-- servlet-mapping> <servlet-name>CXFServlet</servlet-name> <Need this 
+		* to make servlet mapping correct!!!> <url-pattern>/FIService/*</url-pattern> 
+		</servlet-mapping -->
+
+	<!-- Add a filter to control keep session open in one request/response cycle -->
+	<filter>
+		<filter-name>sessionFilter</filter-name>
+		<filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>sessionFilter</filter-name>
+		<url-pattern>/FIService/*</url-pattern>
+	</filter-mapping>
+
+	<welcome-file-list>
+		<welcome-file>FIView.html</welcome-file>
+	</welcome-file-list>
+	<!-- END SNIPPET: xfire -->
+
+	<servlet-mapping>
+		<servlet-name>ReactionDiagram</servlet-name>
+		<url-pattern>/reactomeService</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>ReactionDiagram</servlet-name>
+		<url-pattern>/queryFileUpload</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>FIService</servlet-name>
+		<servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+		<!-- servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class -->
+		<!-- init-param> <param-name>com.sun.jersey.config.property.packages</param-name> 
+			<param-value>org.reactome.r3.fi</param-value> </init-param -->
+		<init-param>
+			<param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
+			<param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
+		</init-param>
+		<init-param>
+			<param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
+			<param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
+		</init-param>
+		<init-param>
+			<param-name>com.sun.jersey.config.feature.logging.DisableEntitylogging</param-name>
+			<param-value>true</param-value>
+		</init-param>
+
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>FIService</servlet-name>
+		<url-pattern>/FIService/*</url-pattern>
+	</servlet-mapping>
 
 </web-app>

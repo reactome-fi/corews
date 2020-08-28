@@ -224,6 +224,30 @@ public class FINetworkResourceTests {
     }
     
     @Test
+    public void testQueryDorotheaFIs() throws Exception {
+        String url = NETWORK_URL + "fetchDorotheaFIs/mouse";
+        System.out.println("URL: " + url);
+        String text = callHttp(url, HTTP_GET, null);
+        System.out.println(text);
+        url = NETWORK_URL + "fetchDorotheaFIs/human";
+        System.out.println("URL: " + url);
+        text = callHttp(url, HTTP_GET, null);
+        System.out.println(text);
+        // For mouse annotation
+        String fis = "Hoxb8\tPkdrej\nHes5\tIfit3b\nDmap1\tC8g";
+        url = NETWORK_URL + "annotateDorotheaFIs/mouse";
+        text = callHttp(url, HTTP_POST, fis);
+        System.out.println("URL: " + url);
+        System.out.println(text);
+        // For human annotation
+        fis = "ZBTB5\tLIN7C\nTBX6\tMKS1\nPAX7\tDNAJC1";
+        url = NETWORK_URL + "annotateDorotheaFIs/human";
+        text = callHttp(url, HTTP_POST, fis);
+        System.out.println("URL: " + url);
+        System.out.println(text);
+    }
+    
+    @Test
     public void tetsGetMouseToHumanGeneMap() throws Exception {
         String url = NETWORK_URL + "mouse2HumanGeneMap";
         System.out.println("URL : " + url);

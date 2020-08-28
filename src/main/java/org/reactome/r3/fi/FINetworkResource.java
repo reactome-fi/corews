@@ -9,12 +9,15 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -48,6 +51,7 @@ import org.reactome.r3.graph.NetworkBuilderForGeneSet;
 import org.reactome.r3.graph.NetworkClusterResult;
 import org.reactome.r3.graph.SpectralPartitionNetworkCluster;
 import org.reactome.r3.model.ReactomeInstance;
+import org.reactome.r3.service.DorotheaIntearctionService;
 import org.reactome.r3.service.FIServiceUtilities;
 import org.reactome.r3.service.HibernateInteractionDAO;
 import org.reactome.r3.service.InteractionService;
@@ -86,10 +90,16 @@ public class FINetworkResource {
     private PathwayToBooleanNetworkConverter bnConverter;
     // For human mouse gene mapper
     private HumanMouseGeneMapper humanMouseGeneMapper;
+    // For Dorothea TF/Target interactions
+    private DorotheaIntearctionService dorotheaService;
     
     public FINetworkResource() {
     }
-    
+
+    public void setDorotheaService(DorotheaIntearctionService dorotheaService) {
+        this.dorotheaService = dorotheaService;
+    }
+
     public HumanMouseGeneMapper getHumanMouseGeneMapper() {
         return humanMouseGeneMapper;
     }
@@ -291,6 +301,45 @@ public class FINetworkResource {
         for (String fi : fis)
             builder.append(fi).append("\n");
         return builder.toString();
+    }
+    
+    /**
+     * This method is used to fetch dorothea TF/target interactions.
+     */
+    @Path("/fetchDorotheaFIs/{species}")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String fetchDorotheaFIs(@PathParam("species") String species) throws Exception {
+        Set<String> fis = null;
+        if (species.equals("human"))
+            fis = dorotheaService.getHumanInteractions();
+        else if (species.equals("mouse"))
+            fis = dorotheaService.getMouseInteractions();
+        else
+            return "error: " + species + " is not supported.";
+        return String.join("\n", fis);
+    }
+    
+    /**
+     * Annotate dorothea TF/Target interactions
+     * @param queryFIs
+     * @throws Exception
+     */
+    @Path("/annotateDorotheaFIs/{species}")
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    public List<FIAnnotation> annotateDorotheaFIs(@PathParam("species") String species,
+                                                  String queryFIs) throws Exception {
+        Set<String> fis = Stream.of(queryFIs.split("\n")).collect(Collectors.toSet());
+        List<FIAnnotation> rtn = null;
+        if (species.equals("human"))
+            rtn = dorotheaService.annotateHumanInteractions(fis);
+        else if (species.equals("mouse"))
+            rtn = dorotheaService.annotateMouseInteractions(fis);
+        else
+            rtn = Collections.EMPTY_LIST; // Just use an empty list
+        return rtn;
     }
     
     /**

@@ -6,11 +6,13 @@ package org.reactome.r3.fi;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.gk.model.GKInstance;
 import org.gk.model.InstanceNotFoundException;
@@ -32,6 +34,7 @@ import org.reactome.funcInt.Interaction;
 import org.reactome.funcInt.Protein;
 import org.reactome.funcInt.ReactomeSource;
 import org.reactome.funcInt.ReactomeSourceType;
+import org.reactome.r3.util.FileUtility;
 
 /**
  * This class is used to convert a Reactome pathway into a list of Interaction objects. This class
@@ -391,16 +394,109 @@ public class PathwayToFIsConverter {
     }
     
     @Test
-    public void testConvertPathwayToFIs() throws Exception {
+    @SuppressWarnings("unchecked")
+    public void dumpHumanFIsInDB() throws Exception {
         MySQLAdaptor dba = new MySQLAdaptor("localhost",
-                                            "reactome_67_plus_i",
+                                            "gk_current_ver75",
                                             "root",
                                             "macmysql01");
         setMySQLAdaptor(dba);
+        InteractionAnnotator annotator = new InteractionAnnotator();
+        annotator.setSourceDBA(dba);
+        setAnnotator(annotator);
+        
+        Map<String, Interaction> pairToInteractionMap = new HashMap<String, Interaction>();
+        Map<Long, ReactomeSource> idToSourceMap = new HashMap<Long, ReactomeSource>();
+        Map<GKInstance, Protein> instToProtein = new HashMap<GKInstance, Protein>();
+        // To help objects to extract FIs.
+        ReactomeAnalyzer reactomeAnalyzer = new ReactomeAnalyzer();
+        reactomeAnalyzer.setMySQLAdaptor(this.dba);
+        ReactomeAnalyzerTopicHelper topicHelper = new ReactomeAnalyzerTopicHelper();
+        
+        GKInstance homoSapiens = dba.fetchInstance(48887L);
+        Collection<GKInstance> rxts = dba.fetchInstanceByAttribute(ReactomeJavaConstants.ReactionlikeEvent,
+                                                                   ReactomeJavaConstants.species,
+                                                                   "=", 
+                                                                   homoSapiens);
+        System.out.println("Total human Rxt: " + rxts.size());
+        Set<GKInstance> interactors = new HashSet<GKInstance>();
+        for (GKInstance rxt : rxts) {
+            interactors.clear();
+            reactomeAnalyzer.extractInteractorsFromReaction(rxt, interactors);
+            generateInteractions(interactors, 
+                                 rxt, 
+                                 topicHelper,
+                                 pairToInteractionMap,
+                                 instToProtein,
+                                 idToSourceMap);
+        }
+        Collection<GKInstance> complexes = dba.fetchInstanceByAttribute(ReactomeJavaConstants.Complex,
+                                                                        ReactomeJavaConstants.species,
+                                                                        "=",
+                                                                        homoSapiens);
+        System.out.println("Total human complexes: " + complexes.size());
+        for (GKInstance complex : complexes) {
+            interactors.clear();
+            reactomeAnalyzer.grepComplexComponents(complex, interactors);
+            generateInteractions(interactors,
+                                 complex,
+                                 topicHelper,
+                                 pairToInteractionMap,
+                                 instToProtein,
+                                 idToSourceMap);
+        }
+        System.out.println("Annotating fis...");
+        List<Interaction> interactions = new ArrayList<Interaction>(pairToInteractionMap.values());
+        annotate(interactions);
+        System.out.println("Total FIs: " + interactions.size());
+        Collections.sort(interactions, (i1, i2) -> {
+            String i1Name1 = i1.getFirstProtein().getShortName();
+            String i1Name2 = i1.getSecondProtein().getShortName();
+            String i2Name1 = i2.getFirstProtein().getShortName();
+            String i2Name2 = i2.getSecondProtein().getShortName();
+            int rtn = i1Name1.compareTo(i2Name1);
+            if (rtn == 0)
+                rtn = i1Name2.compareTo(i2Name2);
+           return rtn;
+        });
+        String file = "/Users/wug/temp/ReactomeRelease75FIs_120720.tsv";
+        FileUtility fu = new FileUtility();
+        fu.setOutput(file);
+        fu.printLine("Gene1\tGene2\tAnnotation\tDirection\tReactomeSourceIds");
+        for (Interaction i : interactions) {
+            fu.printLine(i.getFirstProtein().getShortName() + "\t" + 
+                         i.getSecondProtein().getShortName() + "\t" + 
+                         i.getAnnotation().getAnnotation() + "\t" + 
+                         i.getAnnotation().getDirection() + "\t" + 
+                         i.getReactomeSources().stream()
+                          .map(s -> s.getReactomeId())
+                          .sorted().map(id -> id.toString())
+                          .collect(Collectors.joining(",")));
+        }
+        fu.close();
+    }
+    
+    @Test
+    public void testConvertPathwayToFIs() throws Exception {
+        MySQLAdaptor dba = new MySQLAdaptor("localhost",
+                                            "reactome_71_plus_i_mm",
+                                            "root",
+                                            "macmysql01");
+        setMySQLAdaptor(dba);
+        InteractionAnnotator annotator = new InteractionAnnotator();
+        annotator.setSourceDBA(dba);
+        setAnnotator(annotator);
         // Check Cell Cycle Checkpoints: 69620
         Long dbId = 69620L;
         List<Interaction> interactions = convertPathwayToFIs(dbId);
         System.out.println("Total interactions: " + interactions.size());
+        for (Interaction i : interactions) {
+            System.out.println(i.getFirstProtein().getShortName() + "\t" + 
+                               i.getSecondProtein().getShortName() + "\t" + 
+                               i.getAnnotation().getAnnotation() + "\t" + 
+                               i.getAnnotation().getDirection() + "\t" + 
+                               i.getReactomeSources().stream().map(s -> s.getReactomeId() + "").collect(Collectors.joining(",")));
+        }
         
     }
 }

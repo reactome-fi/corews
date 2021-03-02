@@ -971,7 +971,8 @@ public class InteractionAnnotator {
         Properties config = new Properties();
         config.load(new FileInputStream(configFile));
         
-        String dirName = fiNetworkBuildDir + "results/" + config.getProperty("YEAR") + "/";
+        String resultDir = config.getProperty("RESULT_DIR");
+        String dirName = resultDir.replace("${YEAR}", config.getProperty("YEAR")) + "/";
         MySQLAdaptor dba = new MySQLAdaptor("localhost",
                                             config.getProperty("REACTOME_SOURCE_DB_NAME"),
                                             config.getProperty("DB_USER"),

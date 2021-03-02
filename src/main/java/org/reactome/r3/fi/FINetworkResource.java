@@ -42,7 +42,6 @@ import org.reactome.booleannetwork.BooleanNetwork;
 import org.reactome.factorgraph.FactorGraph;
 import org.reactome.funcInt.FIAnnotation;
 import org.reactome.funcInt.Interaction;
-import org.reactome.pagerank.HotNetResult;
 import org.reactome.pathway.booleannetwork.PathwayToBooleanNetworkConverter;
 import org.reactome.r3.fi.ReactomeObjectHandler.GeneInDiagramToGeneToPEIds;
 import org.reactome.r3.fi.ReactomeObjectHandler.GeneToPEIds;
@@ -77,7 +76,8 @@ public class FINetworkResource {
     // For encode TF/target related queries
     private EncodeTFTargetInteractionQuery encodeTFTargetQuery;
     // For HotNet mutation analysis
-    private HotNetAnalysisHelper hotNetHelper;
+    // Disable as of September 7, 2020
+//    private HotNetAnalysisHelper hotNetHelper;
     // For Pathway and FIs converting
     private PathwayToFIsConverter pathwayToFIsConverter;
     // For Reactome related simple object handling
@@ -138,14 +138,6 @@ public class FINetworkResource {
 
     public void setReactomeObjectHandler(ReactomeObjectHandler reactomeObjectHandler) {
         this.reactomeObjectHandler = reactomeObjectHandler;
-    }
-
-    public void setHotNetHelper(HotNetAnalysisHelper helper) {
-        this.hotNetHelper = helper;
-    }
-    
-    public HotNetAnalysisHelper getHotNetHelper() {
-        return this.hotNetHelper;
     }
     
     public EncodeTFTargetInteractionQuery getEncodeTFTargetQuery() {
@@ -329,6 +321,7 @@ public class FINetworkResource {
     @POST
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+    @SuppressWarnings("unchecked")
     public List<FIAnnotation> annotateDorotheaFIs(@PathParam("species") String species,
                                                   String queryFIs) throws Exception {
         Set<String> fis = Stream.of(queryFIs.split("\n")).collect(Collectors.toSet());
@@ -958,64 +951,6 @@ public class FINetworkResource {
             // Avoid to print out the query, which should be very long!
             logger.error("Error in doSurvivalAnalysis: \n" + e.getMessage(),
                          e);
-            throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-        }
-    }
-    
-    /**
-     * This method is used to do HotNet based mutation analysis.
-     * @param query
-     * @return
-     */
-    @Path("/hotnetAnalysis")
-    @POST
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public HotNetResult doHotNetAnalysis(String query) {
-        // Parse the query
-        String[] tokens = query.split("\n");
-        Map<String, Double> geneToScore = new HashMap<String, Double>();
-        // The following are special lines
-//        builder.append("delta:" + delta);
-//        builder.append("fdrCutoff:" + fdrCutoff);
-//        builder.append("permutationNumber:" + permutation);
-        Double delta = null;
-        Double fdrCutoff = null;
-        Integer permutationNumber = null;
-        for (String token : tokens) {
-            if (token.contains(":")) {
-                int index = token.indexOf(":");
-                String key = token.substring(0, index);
-                String value = token.substring(index + 1);
-                if (key.equals("delta")) {
-                    if (!value.equals("null"))
-                        delta = new Double(value);
-                }
-                else if (key.equals("fdrCutoff")) {
-                    if (!value.equals("null"))
-                        fdrCutoff = new Double(value);
-                }
-                else if (key.equals("permutationNumber")) {
-                    if (!value.equals("null"))
-                        permutationNumber = new Integer(value);
-                }
-            }
-            else {
-                int index = token.indexOf("\t");
-                String gene = token.substring(0, index);
-                String score = token.substring(index + 1);
-                geneToScore.put(gene, new Double(score));
-            }
-        }
-        try {
-            HotNetResult result = hotNetHelper.doHotNetAnalysis(geneToScore, 
-                                                                delta, 
-                                                                fdrCutoff, 
-                                                                permutationNumber);
-            return result;
-        }
-        catch(Exception e) {
-            logger.error("Error in doHotNetAnalysis: \n" + e.getMessage(), e);
             throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
         }
     }

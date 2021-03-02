@@ -41,7 +41,8 @@ public class AccessLoggingAnalyzer {
 //    private final String DIR_NAME = "/Users/gwu/Documents/EclipseWorkspace/caBigR3WebApp/logs/access/042116/";
 //    private final String DIR_NAME = "/Users/gwu/Documents/EclipseWorkspace/caBigR3WebApp/logs/access/043017/";
 //    private final String DIR_NAME = "logs/access/110317/";
-    private final String DIR_NAME = "logs/access/120718/";
+//    private final String DIR_NAME = "logs/access/120718/";
+    private final String DIR_NAME = "logs/access/100320/";
 //    private String URL_PATH = "/caBigR3WebApp";
     // Used to get Date
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -58,7 +59,6 @@ public class AccessLoggingAnalyzer {
 //        URL_PATH = "/caBIOWebApp";
         Map<Date, List<String>> dateToIps = new HashMap<Date, List<String>>();
         FileUtility fu = new FileUtility();
-        String line = null;
         // Used to check daily average
 //        SummaryStatistics stat = new SummaryStatistics();
         // For FI plug-in
@@ -70,6 +70,8 @@ public class AccessLoggingAnalyzer {
               "/caBigR3WebApp2015",
               "/caBigR3WebApp2016",
               "/caBigR3WebApp2017",
+              "/caBigR3WebApp2018",
+              "/caBigR3WebApp2019",
               "/ReactomeRESTfulAPI_PathX"
         };
         // For Reactome RESTFUL API
@@ -99,8 +101,11 @@ public class AccessLoggingAnalyzer {
 //        cutoffDateLater = dateFormat.parse("2016-11-01");
 //        cutoffDateEarlier = dateFormat.parse("2017-10-31");
         
-        cutoffDateLater = dateFormat.parse("2018-01-01");
-        cutoffDateEarlier = dateFormat.parse("2018-11-30");
+//        cutoffDateLater = dateFormat.parse("2018-01-01");
+//        cutoffDateEarlier = dateFormat.parse("2018-11-30");
+        
+        cutoffDateLater = dateFormat.parse("2019-10-01");
+        cutoffDateEarlier = dateFormat.parse("2020-09-30");
 
         for (String urlPath : urlPaths) {
             parseFiles(urlPath,
@@ -139,7 +144,7 @@ public class AccessLoggingAnalyzer {
         String line;
         int index;
         File dir = new File(DIR_NAME);
-        File[] files = dir.listFiles();
+        List<File> files = listFiles(dir);
         for (File file : files) {
             String name = file.getName();
             if (!name.endsWith(".txt"))
@@ -167,6 +172,30 @@ public class AccessLoggingAnalyzer {
             }
             fu.close();
         }
+    }
+    
+    private List<File> listFiles(File dir) {
+        List<File> files = new ArrayList<>();
+        List<File> currentDirs = new ArrayList<>();
+        List<File> nextDirs = new ArrayList<>();
+        currentDirs.add(dir);
+        while (currentDirs.size() > 0) {
+            for (File tmpDir : currentDirs) {
+                File[] tmpFiles = tmpDir.listFiles();
+                if (tmpFiles == null || tmpFiles.length == 0)
+                    continue;
+                for (File tmpFile : tmpFiles) {
+                    if (tmpFile.isDirectory())
+                        nextDirs.add(tmpFile);
+                    else if (tmpFile.getName().endsWith(".txt"))
+                        files.add(tmpFile);
+                }
+            }
+            currentDirs.clear();
+            currentDirs.addAll(nextDirs);
+            nextDirs.clear();
+        }
+        return files;
     }
     
     private List<String> getTotalIPs(Map<Date, List<String>> dateToIps) {

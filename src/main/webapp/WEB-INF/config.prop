@@ -1,10 +1,14 @@
+# This configuration file is used to deploy a corews web application for the mouse pathway related services.
+# The required change is the database, which should NOT be the reactome_xx_plus_i. This database should be the
+# same release of the xx (version), but with all predicted pathways there. To get this database, just download the main
+# mysql dump from Reactome's download page.
 # This file is used to config db connecting properties
 jdbc.dbHost=localhost
 jdbc.dbUser=root
 jdbc.dbPwd=macmysql01
 jdbc.dbPort=3306
-Reactome.src.dbName=reactome_71_plus_i
-elv.dbName=reactome_71_plus_i
+Reactome.src.dbName=gk_current_ver73
+elv.dbName=gk_current_ver73
 # For local data analysis
 #Reactome.src.dbName=test_slice_64
 #elv.dbName=test_slice_64
@@ -26,10 +30,9 @@ name.to.pathways=ProteinNameToTopics020720.txt
 
 #Used for the Reactome only FI network for local data analysis
 #name.to.pathways=ProteinNameToReactomePathways031516.txt
-
-name.to.reactome.pathways=ProteinNameToReactomePathways020720.txt
+name.to.reactome.pathways=ProteinNameToReactomePathways_Rel_73_070720.txt
 # For mouse genes to mouse pathway
-mouse.name.to.reactome.pathways=MouseGeneToReactomePathways070620.txt
+mouse.name.to.reactome.pathways=MouseGeneToReactomePathways_Rel_73_070720.txt
 # Test code
 reactome.reaction.to.pathways=ReactomeReactionsToPathways_051017.txt
 reactome.pathway.list=ReactomePathways020720.txt

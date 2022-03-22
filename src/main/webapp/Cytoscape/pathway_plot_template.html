@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Reactome Pathway Enrichment Result Plot</title>
+</head>
+<body>
+<head>
+	<!-- Load plotly.js into the DOM. Use a fixed version to avoid potential bug. -->
+	<script src='https://cdn.plot.ly/plotly-2.9.0.min.js'></script>
+</head>
+
+<body>
+	<div id='pathway_plot'><!-- Plotly chart will be drawn inside this DIV --></div>
+</body>
+<!-- partial -->
+  <script>
+      // An example of one trace. This should not be used.
+//     var pathway_trace = {
+//   x: ['A', 'C'],
+//   y: [1, 1],
+//   mode: 'markers',
+//   type: 'scatter',
+//   name: 'Team A',
+//   text: ['A-1', 'A-2'],
+// };
+
+var data = $data;
+
+var layout = {
+  xaxis: {
+    title: "Pathway",
+    showticklabels: false,
+    categoryorder: "array",
+    categoryarray: $pathway_list,
+  },
+  yaxis: {
+    title: "-Log10(pValue)",
+  },
+  showlegend: true, // Always let this on
+  font: {size: 12},
+};
+
+var config = {responsive: true};
+
+Plotly.newPlot('pathway_plot', data, layout, config);
+  </script>
+
+</body>
+</html>

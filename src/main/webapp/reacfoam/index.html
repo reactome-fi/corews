@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Reacfoam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+
+    <meta charset="utf-8"/>
+    <link href="resources/images/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon"/>
+    <link href="lib/foamtree/assets/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="lib/foamtree/assets/css/common.css" rel="stylesheet"/>
+
+    <!-- Include the default style for the interaction hints and guide -->
+    <link href="lib/foamtree/assets/css/carrotsearch.foamtree.util.hints.css" rel="stylesheet"/>
+
+    <!-- Customised for Reactome -->
+    <link href="resources/css/custom.css" rel="stylesheet"/>
+</head>
+<body>
+<div id="container">
+    <div id="visualization"></div>
+    <!--Loading spinner-->
+    <div class="waiting" style="display:none; height: 100%; width: 100%;text-align: center;">
+        <div class="sk-circle">
+            <div class="sk-circle1 sk-child"></div>
+            <div class="sk-circle2 sk-child"></div>
+            <div class="sk-circle3 sk-child"></div>
+            <div class="sk-circle4 sk-child"></div>
+            <div class="sk-circle5 sk-child"></div>
+            <div class="sk-circle6 sk-child"></div>
+            <div class="sk-circle7 sk-child"></div>
+            <div class="sk-circle8 sk-child"></div>
+            <div class="sk-circle9 sk-child"></div>
+            <div class="sk-circle10 sk-child"></div>
+            <div class="sk-circle11 sk-child"></div>
+            <div class="sk-circle12 sk-child"></div>
+        </div>
+    </div>
+</div>
+
+<div id="export" style="display: none">
+    <button name="export-button" class="export-button" title="Export">
+        <div>
+            <img src="resources/images/export.png" width="64px" height="64px" class="export-image">
+        </div>
+    </button>
+</div>
+
+<div id="colorLegend" style="display:none;">
+    <span class="inlineLabelTop"></span>
+    <canvas id="legendCanvasGradient" width="30" height="200"></canvas>
+    <canvas id="legendCanvasFlag" width="50" height="210"></canvas>
+    <span class="inlineLabelBottom"></span>
+</div>
+
+<div class="bottomPanel">
+    <div id="expressionBar" style="display: none">
+        <button name="prev" class="prevButton" title="Show Previous"></button>
+        <button name="play" class="playButton" title="Play"></button>
+        <button class="pauseButton" name="pause" style="display: none" title="Pause"></button>
+        <button name="next" class="nextButton" title="Show Next"></button>
+        <div id="columnNames"></div>
+        <button name="close" class="closeButton" title="Close"></button>
+    </div>
+    <div id="enrichmentBar" style="display: none">
+        <span>OVERREPRESENTATION</span>
+        <span>Showing</span>
+        <select class="showing">
+<!--             <option value="false">pValue</option> -->
+            <!-- Change to FDR values -->
+            <option value="false">FDR</option>
+            <option value="true">coverage</option>
+        </select>
+        <button class="closeButton" name="close" title="Close"></button>
+    </div>
+
+    <div id="flagBar" style="display: none">
+        <div id="flagPathway"></div>
+        <button class="closeButton" name="clearFlg" title="Clear Flag"></button>
+    </div>
+</div>
+<div id="layout">
+    View:
+    <a href="#flattened">flattened</a> | <a href="#hierarchical">hierarchical</a>
+</div>
+
+<!-- External libraries to help to export visualization to an image  -->
+<script src="lib/foamtree/assets/js/filesaver.min.js"></script>
+<script src="lib/foamtree/assets/js/b64.js"></script>
+<script src="lib/foamtree/assets/js/html2canvas.min.js"></script>
+
+<!-- Include Hammer.js for mobile interactions and touch events. Not required for desktop-only apps. -->
+<script src="lib/foamtree/assets/js/hammer.min.js"></script>
+
+<!-- Foamtree library -->
+<script src="lib/foamtree/carrotsearch.foamtree.js?v=1.0"></script>
+
+<!-- A number of utilities we'll need -->
+<script src="lib/jquery/jquery-3.3.1.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/webfont/1.4.7/webfont.js"></script>
+
+<!--Custom javascript-->
+<script src="resources/js/tools.js?v=1.0"></script>
+<script src="resources/js/initiate.js?v=1.0"></script>
+<script src="resources/js/getData.js?v=1.0"></script>
+<script src="resources/js/foamtreeStarts.js?v=1.0"></script>
+<script src="resources/js/foamtreeAnalysisEnrichment.js?v=1.0"></script>
+<script src="resources/js/foamtreeAnalysisExpression.js?v=1.0"></script>
+
+<!-- Include the interaction hints utility -->
+<script src="resources/js/foamtreeHintsCustom.js?v=1.0"></script>
+</body>
+</html>

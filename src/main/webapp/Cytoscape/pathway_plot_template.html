@@ -28,6 +28,10 @@
 var data = $data;
 
 var layout = {
+  title: {
+    text: "$title",
+    font: {size: 13},
+  },
   xaxis: {
     title: "Pathway",
     showticklabels: false,
@@ -35,7 +39,7 @@ var layout = {
     categoryarray: $pathway_list,
   },
   yaxis: {
-    title: "-Log10(pValue)",
+    title: "$y_title",
   },
   showlegend: true, // Always let this on
   font: {size: 12},

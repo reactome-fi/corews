@@ -11,7 +11,7 @@
 </head>
 
 <body>
-	<div id='pathway_plot'><!-- Plotly chart will be drawn inside this DIV --></div>
+	<div id='pathway_plot_div'><!-- Plotly chart will be drawn inside this DIV --></div>
 </body>
 <!-- partial -->
   <script>
@@ -25,9 +25,9 @@
 //   text: ['A-1', 'A-2'],
 // };
 
-var data = $data;
+let data = $data;
 
-var layout = {
+let layout = {
   title: {
     text: "$title",
     font: {size: 13},
@@ -43,11 +43,34 @@ var layout = {
   },
   showlegend: true, // Always let this on
   font: {size: 12},
+  shapes: [$lines]
 };
 
-var config = {responsive: true};
+let config = {responsive: true};
 
-Plotly.newPlot('pathway_plot', data, layout, config);
+Plotly.newPlot('pathway_plot_div', data, layout, config);
+
+let pathway_plot = document.getElementById('pathway_plot_div');
+
+pathway_plot.on('plotly_restyle', function(data) {
+  let plot_data = pathway_plot.data;
+  if (plot_data.length < 2) // Nothing to plot
+    return true;
+  // Get the set of pathways shown
+  let shown_pathways = new Set();
+  for (let trace of plot_data) {
+    // Default is undefined
+    if (trace.visible === undefined || trace.visible === true) {
+      trace.x.forEach(p => shown_pathways.add(p))
+    }
+  }
+  for (let line of pathway_plot.layout.shapes) {
+    line.visible = shown_pathways.has(line.x0)
+  }
+  Plotly.relayout(pathway_plot, pathway_plot.layout);
+  return true; // Pass to the original handler
+});
+
   </script>
 
 </body>

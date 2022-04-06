@@ -3,17 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>Reactome Pathway Enrichment Result Plot</title>
-</head>
-<body>
-<head>
-	<!-- Load plotly.js into the DOM. Use a fixed version to avoid potential bug. -->
+  <!-- Load plotly.js into the DOM. Use a fixed version to avoid potential bug. -->
 	<script src='https://cdn.plot.ly/plotly-2.9.0.min.js'></script>
 </head>
-
 <body>
 	<div id='pathway_plot_div'><!-- Plotly chart will be drawn inside this DIV --></div>
-</body>
-<!-- partial -->
   <script>
       // An example of one trace. This should not be used.
 //     var pathway_trace = {
@@ -72,6 +66,5 @@ pathway_plot.on('plotly_restyle', function(data) {
 });
 
   </script>
-
 </body>
 </html>

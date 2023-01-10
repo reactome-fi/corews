@@ -296,6 +296,33 @@ public class FINetworkResource {
     }
     
     /**
+     * List the stable ids of pathways used for Boolean networks-based logic simulation.
+     * The species should be three letters as used in stable ids. e.g. HSA for homo sapiens
+     * mmu for mice. Case doesn't matter.
+     * @return
+     * @throws Exception
+     */
+    @Path("/pathways/logicmodels/{species}")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String listPathwaysForBNs(@PathParam("species") String species) throws Exception {
+    	List<GKInstance> pathways = reactomeObjectHandler.loadPathwayList();
+    	// For some performance gaining
+    	MySQLAdaptor dba = reactomeObjectHandler.getSrcDBA();
+    	dba.loadInstanceAttributeValues(pathways, new String[] {ReactomeJavaConstants.stableIdentifier});
+    	List<String> rtn = new ArrayList<String>();
+    	for (GKInstance pathway : pathways) {
+    		GKInstance stableId = (GKInstance) pathway.getAttributeValue(ReactomeJavaConstants.stableIdentifier);
+    		if (stableId == null)
+    			continue;
+    		String id = (String) stableId.getAttributeValue(ReactomeJavaConstants.identifier);
+    		if (id != null && id.contains("-" + species.toUpperCase() + "-"))
+    			rtn.add(id);
+    	}
+    	return String.join("\n", rtn);
+    }
+    
+    /**
      * This method is used to fetch dorothea TF/target interactions.
      */
     @Path("/fetchDorotheaFIs/{species}")
@@ -310,6 +337,20 @@ public class FINetworkResource {
         else
             return "error: " + species + " is not supported.";
         return String.join("\n", fis);
+    }
+    
+    /**
+     * Download the dorothea TF/target interaction file with confidence.
+     * @return
+     */
+    @Path("/downloadDorotheaFIs/{species}/{confidence}")
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String downloadDorotheFIs(@PathParam("species") String species,
+                                           @PathParam("confidence") String confidence) throws Exception {
+        char[] confidenceTokens = confidence.toCharArray();
+        List<String> lines = dorotheaService.loadInteractions(species, confidenceTokens);
+        return String.join("\n", lines);
     }
     
     /**

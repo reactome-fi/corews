@@ -128,16 +128,16 @@
 		</dependency>
 
 		<!-- This has been replaced by the following two jar files -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.reactome</groupId> -->
-<!-- 			<artifactId>caBIGR3</artifactId> -->
-<!-- 			<version>1.0</version> -->
-<!-- 		</dependency> -->
-		
+		<!-- <dependency> -->
+		<!-- <groupId>org.reactome</groupId> -->
+		<!-- <artifactId>caBIGR3</artifactId> -->
+		<!-- <version>1.0</version> -->
+		<!-- </dependency> -->
+
 		<dependency>
 			<groupId>org.reactome.fi</groupId>
 			<artifactId>modeling</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.3</version>
 		</dependency>
 
 		<dependency>
@@ -290,6 +290,11 @@
 			</resource>
 		</resources>
 		<plugins>
+		      <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.1</version>
+            </plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.5.1</version>
@@ -300,7 +305,6 @@
 			</plugin>
 
 			<!-- Embedded Apache Tomcat required for testing war -->
-
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
@@ -312,6 +316,6 @@
 			</plugin>
 		</plugins>
 
-		<finalName>caBigR3WebApp2018</finalName>
+		<finalName>caBigR3WebApp2021</finalName>
 	</build>
 </project>

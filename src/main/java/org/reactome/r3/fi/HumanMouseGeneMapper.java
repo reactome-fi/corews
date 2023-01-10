@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
-import org.reactome.fi.util.FileUtility;
+import org.reactome.r3.util.FileUtility;
 
 /**
  * This class is used to create an orthologous map between human and mouse genes.

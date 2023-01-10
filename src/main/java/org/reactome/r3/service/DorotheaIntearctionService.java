@@ -1,7 +1,10 @@
 package org.reactome.r3.service;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,6 +26,8 @@ public class DorotheaIntearctionService {
     private final static Logger logger = Logger.getLogger(DorotheaIntearctionService.class);
     private Map<String, FIAnnotation> mouseFIToAnnot;
     private Map<String, FIAnnotation> humanFIToAnnot;
+    private String mouseFileName;
+    private String humanFileName;
     
     public DorotheaIntearctionService() {
     }
@@ -52,13 +57,42 @@ public class DorotheaIntearctionService {
     }
     
     public void setMouseFile(String fileName) {
+        this.mouseFileName = fileName;
         mouseFIToAnnot = new HashMap<>();
         loadData(fileName, mouseFIToAnnot);
     }
     
     public void setHumanFile(String fileName) {
+        this.humanFileName = fileName;
         humanFIToAnnot = new HashMap<>();
         loadData(fileName, humanFIToAnnot);
+    }
+    
+    public List<String> loadInteractions(String species,
+                                         char[] confidence) throws IOException {
+        String fileName = null;
+        if (species.equals("human"))
+            fileName = humanFileName;
+        else if (species.equals("mouse"))
+            fileName = mouseFileName;
+        if (fileName == null)
+            throw new IllegalArgumentException(species + " is not supported.");
+        // Handle confidence
+        Set<String> confidenceSet = new HashSet<>();
+        for (char c : confidence)
+            confidenceSet.add(c + "");
+        FileUtility fu = new FileUtility();
+        fu.setInput(fileName);
+        String line = fu.readLine();
+        List<String> rtn = new ArrayList<>();
+        rtn.add(line);
+        while ((line = fu.readLine()) != null) {
+            String[] tokens = line.split("\t");
+            if (confidenceSet.contains(tokens[1]))
+                rtn.add(line);
+        }
+        fu.close();
+        return rtn;
     }
     
     private void loadData(String fileName,

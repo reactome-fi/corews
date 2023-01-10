@@ -109,6 +109,13 @@ public class FINetworkResourceTests {
     }
     
     @Test
+    public void testPathwayHierarchy() throws Exception {
+    	String url = REST_URL + "pathwayHierarchy/Mus+Musculus";
+    	String text = callHttp(url, HTTP_GET, "");
+    	prettyPrintXML(text);
+    }
+    
+    @Test
     public void testBuildNetwork() throws Exception {
         String genes = "TP53\tPTEN\tEGFR";
         genes = "DKK3\tNBN\tMYO6\tTP53\tPML\tIFI16\tBRCA1";
@@ -248,6 +255,18 @@ public class FINetworkResourceTests {
     }
     
     @Test
+    public void testDownloadDorotheaFIs() throws Exception {
+        String url = NETWORK_URL + "downloadDorotheaFIs/mouse/AB";
+        System.out.println("URL: " + url);
+        String text = callHttp(url, HTTP_GET, null);
+        System.out.println(text);
+        url = NETWORK_URL + "downloadDorotheaFIs/human/AB";
+        System.out.println("URL: " + url);
+        text = callHttp(url, HTTP_GET, null);
+        System.out.println(text);
+    }
+    
+    @Test
     public void tetsGetMouseToHumanGeneMap() throws Exception {
         String url = NETWORK_URL + "mouse2HumanGeneMap";
         System.out.println("URL : " + url);
@@ -283,8 +302,7 @@ public class FINetworkResourceTests {
     
     @Test
     public void testQueryReactomeInstance() throws Exception {
-        String dbId = "6815559";
-//        Long dbId = "109581";
+        String dbId = "109581";
         String url = NETWORK_URL + "queryReactomeInstance/" + dbId;
         String text = callHttp(url, HTTP_GET, null);
         System.out.println("queryReactomeInstance:");
@@ -356,6 +374,13 @@ public class FINetworkResourceTests {
         String text = callHttp(url, HTTP_GET, null);
         System.out.println("Query for " + url + ":");
         prettyPrintXML(text);
+    }
+    
+    @Test
+    public void testListPathwaysForBNs() throws Exception {
+    	String url = NETWORK_URL + "pathways/logicmodels/hsa";
+    	String text = callHttp(url, HTTP_GET, null);
+    	System.out.println("Query for " + url + ":\n" + text);
     }
     
     @Test

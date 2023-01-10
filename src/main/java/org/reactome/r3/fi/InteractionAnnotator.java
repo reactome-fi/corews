@@ -42,6 +42,7 @@ import org.reactome.r3.service.HibernateInteractionDAO;
 import org.reactome.r3.service.InteractionDAO;
 import org.reactome.r3.util.FileUtility;
 import org.reactome.r3.util.InteractionUtilities;
+import org.springframework.beans.PropertyAccessorUtils;
 import org.springframework.orm.hibernate3.support.OpenSessionInViewFilter;
 
 /**
@@ -1002,8 +1003,8 @@ public class InteractionAnnotator {
         };
         setInteractionDAO(interactionDAO);
         
-        OpenSessionInViewFilter filter = new OpenSessionInViewFilter();
-        filter.setSingleSession(true);
+//        OpenSessionInViewFilter filter = new OpenSessionInViewFilter();
+//        filter.setSingleSession(true);
         
         // This is a special case occurred in 2014 version of the FI network: because of the same sequence of TRAPPC2 and
         // TRAPPC2P1, the following FI cannot be mapped and a manual annotation has to be performed.
@@ -1032,12 +1033,15 @@ public class InteractionAnnotator {
 
         FileUtility fu = new FileUtility();
         fu.setInput(fiFileName);
+        outFileName = "test.txt";
         fu.setOutput(outFileName);
         fu.printLine("Gene1\tGene2\tAnnotation\tDirection\tScore");
         String line = null;
         int count = 0;
+        long time0 = System.currentTimeMillis();
         while ((line = fu.readLine()) != null) {
-//            if (!(line.contains("ATF2") && line.contains("CDKN1A")))
+        	// The following filter should be disabled for the production release
+//            if (!(line.contains("BRAF") && line.contains("MAP2K1")))
 //                continue;
             String[] tokens = line.split("\t");
             FIAnnotation annotation = annotate(tokens[0], tokens[1]);
@@ -1048,6 +1052,9 @@ public class InteractionAnnotator {
                                            annotation.getScore());
             fu.printLine(outLine);
             count ++;
+            if (count % 1000 == 0) {
+            	System.out.println(count + ": " + (System.currentTimeMillis() - time0) + " ms");
+            }
 //            if (count == 100)
 //                break;
         }

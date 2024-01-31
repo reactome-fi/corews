@@ -109,6 +109,7 @@ public class HumanMouseGeneMapper {
         System.out.println("Size of idToSymbols: " + idToSymbols.size());
         
         // Do some cleaning
+        int totalCount = 0;
         for (String id : idToSymbols.keySet()) {
             List<String> list = idToSymbols.get(id);
             if (list.size() == 1)
@@ -120,8 +121,11 @@ public class HumanMouseGeneMapper {
                                       .collect(Collectors.toSet());
             if (species.size() == 1)
                 continue; // Nothing to do
-            if (list.size() > 2)
+            if (list.size() > 2) {
                 System.out.println(id + ": " + list);
+                totalCount ++;
+            }
         }
+        System.out.println("Total HomologGeneIDs having more than 2 members: " + totalCount);
     }
 }

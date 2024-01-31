@@ -110,7 +110,8 @@ public class FINetworkResourceTests {
     
     @Test
     public void testPathwayHierarchy() throws Exception {
-    	String url = REST_URL + "pathwayHierarchy/Mus+Musculus";
+//    	String url = REST_URL + "pathwayHierarchy/Mus+Musculus";
+        String url = REST_URL + "pathwayHierarchy/Homo+sapiens";
     	String text = callHttp(url, HTTP_GET, "");
     	prettyPrintXML(text);
     }

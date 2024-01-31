@@ -12,10 +12,10 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     <import resource="classpath:META-INF/cxf/cxf-servlet.xml" / -->
     <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="location">
-<!--             <value>WEB-INF/reactomews2019.config.prop</value> -->
-<!--             <value>WEB-INF/config.prop</value> -->
-            <!-- Configuration for the mouse pathways -->
-            <value>WEB-INF/config.mouse.prop</value>
+            <!-- For deployment -->
+<!--             <value>WEB-INF/reactomews2020.config.prop</value> -->
+            <!-- For local server -->
+            <value>WEB-INF/config.prop</value>
         </property>
     </bean>
     
@@ -140,27 +140,9 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 <!--         </property> -->
     </bean>
     
-    <bean id="elvDba" class="org.gk.persistence.MySQLAdaptor">
-        <constructor-arg index="0">
-            <value>${jdbc.dbHost}</value>
-        </constructor-arg>
-        <constructor-arg index="1">
-            <value>${elv.dbName}</value>
-        </constructor-arg>
-        <constructor-arg index="2">
-            <value>${jdbc.dbUser}</value>
-        </constructor-arg>
-        <constructor-arg index="3">
-            <value>${jdbc.dbPwd}</value>
-        </constructor-arg>
-        <constructor-arg index="4">
-            <value>${jdbc.dbPort}</value>
-        </constructor-arg>    
-    </bean>
-    
     <bean id="elvHandler" class="org.reactome.r3.fi.PathwayDiagramHandler">
         <property name="diagramDBA">
-            <ref bean="elvDba" />
+            <ref bean="srcDBA" />
         </property>
 <!--         <property name="dotPath"> -->
 <!--             <value>${dot}</value> -->
@@ -196,15 +178,6 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
         </property>
         <property name="mclScript">
             <value>${resources.dir}${mcl.script}</value>
-        </property>
-    </bean>
-    
-    <bean id="hotNetHelper" class="org.reactome.r3.fi.HotNetAnalysisHelper">
-        <property name="fiFileName">
-            <value>${resources.dir}${fi.bigComp.gene.file}</value>
-        </property>
-        <property name="heatKernelFileName">
-            <value>${resources.dir}${heat.kernel.file}</value>
         </property>
     </bean>
     
@@ -289,6 +262,15 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     	</property>
     </bean>
     
+    <bean id="dorotheaIntearctionService" class="org.reactome.r3.service.DorotheaIntearctionService">
+    	<property name="mouseFile">
+    		<value>${resources.dir}${dorothea.mm}</value>
+    	</property>
+    	<property name="humanFile">
+    		<value>${resources.dir}${dorothea.hs}</value>
+    	</property>    	
+    </bean>
+    
     <bean id="fiNetworkResource" class="org.reactome.r3.fi.FINetworkResource">
         <property name="fIAnnotator">
             <ref bean="fiAnnotator" />
@@ -320,9 +302,6 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
         <property name="mclHelper">
             <ref bean="mclHelper" />
         </property>
-        <property name="hotNetHelper">
-            <ref bean="hotNetHelper" />
-        </property>
         <property name="pathwayToFIsConverter">
             <ref bean="pathwayToFIsConverter" />
         </property>
@@ -340,6 +319,9 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
         </property>
         <property name="humanMouseGeneMapper">
         	<ref bean="humanMouseGeneMapper" />
+        </property>
+        <property name="dorotheaService">
+        	<ref bean="dorotheaIntearctionService" />
         </property>
 <!--         <property name="encodeTFTargetQuery"> -->
 <!--             <ref bean="encodeQuery" /> -->

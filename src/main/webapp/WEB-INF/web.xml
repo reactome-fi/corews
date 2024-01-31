@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
+<!-- Make sure https is used in the following xmlns. Otherwise, Eclipse issues some error. See
+https://stackoverflow.com/questions/3219639/cvc-id-3-error-in-web-xml -->
+<web-app version="2.4" xmlns="https://java.sun.com/xml/ns/j2ee" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
 	                    http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">

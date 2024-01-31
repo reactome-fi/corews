@@ -42,7 +42,11 @@ public class AccessLoggingAnalyzer {
 //    private final String DIR_NAME = "/Users/gwu/Documents/EclipseWorkspace/caBigR3WebApp/logs/access/043017/";
 //    private final String DIR_NAME = "logs/access/110317/";
 //    private final String DIR_NAME = "logs/access/120718/";
-    private final String DIR_NAME = "logs/access/100320/";
+//    private final String DIR_NAME = "logs/access/100320/";
+//    private final String DIR_NAME = "logs/access/2020/access/";
+//    private final String DIR_NAME = "logs/access/2021/access/2021-10";
+//    private final String DIR_NAME = "logs/access/2022/access_2022/";
+    private final String DIR_NAME = "logs/access/2022/access_2022/2022-04";
 //    private String URL_PATH = "/caBigR3WebApp";
     // Used to get Date
     private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -72,6 +76,9 @@ public class AccessLoggingAnalyzer {
               "/caBigR3WebApp2017",
               "/caBigR3WebApp2018",
               "/caBigR3WebApp2019",
+              "/caBigR3WebApp2019_mm",
+              "/caBigR3WebApp2020",
+              "/caBigR3WebApp2021",
               "/ReactomeRESTfulAPI_PathX"
         };
         // For Reactome RESTFUL API
@@ -104,8 +111,14 @@ public class AccessLoggingAnalyzer {
 //        cutoffDateLater = dateFormat.parse("2018-01-01");
 //        cutoffDateEarlier = dateFormat.parse("2018-11-30");
         
-        cutoffDateLater = dateFormat.parse("2019-10-01");
-        cutoffDateEarlier = dateFormat.parse("2020-09-30");
+//        cutoffDateLater = dateFormat.parse("2019-10-01");
+//        cutoffDateEarlier = dateFormat.parse("2020-09-30");
+        
+//        cutoffDateLater = dateFormat.parse("2020-01-01");
+//        cutoffDateEarlier = dateFormat.parse("2020-12-31");
+        
+        cutoffDateLater = dateFormat.parse("2022-01-01");
+        cutoffDateEarlier = dateFormat.parse("2022-12-31");
 
         for (String urlPath : urlPaths) {
             parseFiles(urlPath,

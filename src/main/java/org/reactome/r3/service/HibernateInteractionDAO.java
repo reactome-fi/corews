@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.reactome.funcInt.Evidence;
@@ -51,13 +52,14 @@ public class HibernateInteractionDAO extends HibernateDaoSupport implements Inte
     //TODO: This will be implemented later.
     public List<Interaction> load(Evidence evidence) {
         // Make a copy of evidence as a search criertia to avoid use probability
-        Evidence copy = new Evidence();
-        // Just need these properties
-        copy.setHumanInteraction(evidence.getHumanInteraction());
-        copy.setOrthoInteraction(evidence.getOrthoInteraction());
-        copy.setYeastInteraction(evidence.getYeastInteraction());
-        copy.setGeneExp(evidence.getGeneExp());
-        return null;
+//        Evidence copy = new Evidence();
+//        // Just need these properties
+//        copy.setHumanInteraction(evidence.getHumanInteraction());
+//        copy.setOrthoInteraction(evidence.getOrthoInteraction());
+//        copy.setYeastInteraction(evidence.getYeastInteraction());
+//        copy.setGeneExp(evidence.getGeneExp());
+//        return null;
+        throw new NotImplementedException("load(Evidence) not implemented!");
     }
     
     public Interaction load(long dbId) {

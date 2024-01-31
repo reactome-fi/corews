@@ -42,8 +42,6 @@ import org.reactome.r3.service.HibernateInteractionDAO;
 import org.reactome.r3.service.InteractionDAO;
 import org.reactome.r3.util.FileUtility;
 import org.reactome.r3.util.InteractionUtilities;
-import org.springframework.beans.PropertyAccessorUtils;
-import org.springframework.orm.hibernate3.support.OpenSessionInViewFilter;
 
 /**
  * This class is used to annotate functional interactions.
@@ -351,8 +349,8 @@ public class InteractionAnnotator {
         // Find the highest score in this loop.
         for (Interaction i : interactions) {
             if (i.getEvidence() != null) {
-                if (i.getEvidence().getProbability() > score)
-                    score = i.getEvidence().getProbability();
+                if (i.getEvidence().getScore() > score)
+                    score = i.getEvidence().getScore();
             }
             else { // Extracted FI
                 score = 1.0d;
@@ -966,7 +964,11 @@ public class InteractionAnnotator {
         // should work for all versions.
 //        String fiNetworkBuildDir = "/Users/wug/Documents/eclipse_workspace/FINetworkBuild/";
         // Since 2018, FINetworkBuild project has been migrated to GitHub
-        String fiNetworkBuildDir = "/Users/wug/git/FINetworkBuild/";
+        //String fiNetworkBuildDir = "/Users/wug/git/FINetworkBuild/";
+        
+        // As of the 2022 version, the project has been migrated to the RF version
+        String fiNetworkBuildDir = "/Users/wug/git/FINetworkBuild_RF/";
+        
         String resourceDir = fiNetworkBuildDir + "resources/";
         String configFile = resourceDir + "configuration.prop";
         Properties config = new Properties();
@@ -1033,7 +1035,7 @@ public class InteractionAnnotator {
 
         FileUtility fu = new FileUtility();
         fu.setInput(fiFileName);
-        outFileName = "test.txt";
+//        outFileName = "test.txt";
         fu.setOutput(outFileName);
         fu.printLine("Gene1\tGene2\tAnnotation\tDirection\tScore");
         String line = null;
@@ -1045,6 +1047,10 @@ public class InteractionAnnotator {
 //                continue;
             String[] tokens = line.split("\t");
             FIAnnotation annotation = annotate(tokens[0], tokens[1]);
+            // Should not be escaped. Need to figure out why.
+//            if (annotation == null) {
+//                continue;
+//            }
             String outLine = String.format("%s\t%s\t%s\t%.2f",
                                            line,
                                            annotation.getAnnotation(),

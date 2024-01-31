@@ -1,321 +1,341 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.reactome.fi</groupId>
-	<artifactId>corews</artifactId>
-	<version>1.0.0</version>
-	<packaging>war</packaging>
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.reactome.fi</groupId>
+    <artifactId>corews</artifactId>
+    <version>1.0.0</version>
+    <packaging>war</packaging>
 
-	<!-- The following is based on https://www.boraji.com/how-to-create-a-web-project-using-maven-in-eclipse 
-		and http://www.boraji.com/spring-mvc-4-hibernate-5-restful-crud-operations-example -->
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<failOnMissingWebXml>false</failOnMissingWebXml>
-	</properties>
+    <!-- The following is based on
+    https://www.boraji.com/how-to-create-a-web-project-using-maven-in-eclipse 
+		and
+    http://www.boraji.com/spring-mvc-4-hibernate-5-restful-crud-operations-example -->
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <failOnMissingWebXml>false</failOnMissingWebXml>
+    </properties>
 
-	<dependencies>
+    <dependencies>
 
-		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
-		<!-- This is required by caBIGR3 -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math3</artifactId>
-			<version>3.6.1</version>
-		</dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-math3 -->
+        <!-- This is required by caBIGR3 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.6.1</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.jdom</groupId>
-			<artifactId>jdom</artifactId>
-			<version>1.1.3</version>
-		</dependency>
-		<!-- junit test -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.12</version>
-			<!-- <scope>test</scope> -->
-		</dependency>
-		<!-- Spring MVC Dependency -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-webmvc</artifactId>
-			<version>3.0.2.RELEASE</version>
-		</dependency>
-		<!-- Spring ORM -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-orm</artifactId>
-			<version>3.0.2.RELEASE</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.hibernate/hibernate -->
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate</artifactId>
-			<version>3.2.7.ga</version>
-		</dependency>
+        <dependency>
+            <groupId>org.jdom</groupId>
+            <artifactId>jdom</artifactId>
+            <version>1.1.3</version>
+        </dependency>
+        <!-- junit test -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <!-- <scope>test</scope> -->
+        </dependency>
+        <!-- Spring MVC Dependency -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>3.0.2.RELEASE</version>
+        </dependency>
+        <!-- Spring ORM -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>3.0.2.RELEASE</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.hibernate/hibernate -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate</artifactId>
+            <version>3.2.7.ga</version>
+        </dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.6.1</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-jdk14 -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-jdk14</artifactId>
-			<version>1.6.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.6.1</version>
-		</dependency>
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.6.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-jdk14 -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <version>1.6.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.6.1</version>
+        </dependency>
 
-		<dependency>
-			<groupId>com.mchange</groupId>
-			<artifactId>c3p0</artifactId>
-			<version>0.9.5.2</version>
-		</dependency>
-		<!-- Mysql Connector -->
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.28</version>
-		</dependency>
-		<!-- Jackson API for JSON -->
-		<!-- <dependency> -->
-		<!-- <groupId>com.fasterxml.jackson.core</groupId> -->
-		<!-- <artifactId>jackson-databind</artifactId> -->
-		<!-- <version>2.8.7</version> -->
-		<!-- </dependency> -->
-		<!-- Apache Commons DBCP -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.apache.commons</groupId> -->
-		<!-- <artifactId>commons-dbcp2</artifactId> -->
-		<!-- <version>2.1.1</version> -->
-		<!-- </dependency> -->
-		<!-- Servlet API -->
-		<!-- https://mvnrepository.com/artifact/javax.servlet/servlet-api -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
-			<scope>provided</scope>
-		</dependency>
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.5.2</version>
+        </dependency>
+        <!-- Mysql Connector -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.28</version>
+        </dependency>
+        <!-- Jackson API for JSON -->
+        <!-- <dependency> -->
+        <!-- <groupId>com.fasterxml.jackson.core</groupId> -->
+        <!-- <artifactId>jackson-databind</artifactId> -->
+        <!-- <version>2.8.7</version> -->
+        <!-- </dependency> -->
+        <!-- Apache Commons DBCP -->
+        <!-- <dependency> -->
+        <!-- <groupId>org.apache.commons</groupId> -->
+        <!-- <artifactId>commons-dbcp2</artifactId> -->
+        <!-- <version>2.1.1</version> -->
+        <!-- </dependency> -->
+        <!-- Servlet API -->
+        <!-- https://mvnrepository.com/artifact/javax.servlet/servlet-api -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
 
-		<!-- Add this for linux distribution. It works fine without using this 
+        <!-- Add this for linux distribution. It works fine without using this 
 			for some unknown reason under Mac OSX -->
-		<!-- <dependency> -->
-		<!-- <groupId>com.fasterxml.woodstox</groupId> -->
-		<!-- <artifactId>woodstox-core</artifactId> -->
-		<!-- <version>5.0.2</version> -->
-		<!-- </dependency> -->
+        <!-- <dependency> -->
+        <!-- <groupId>com.fasterxml.woodstox</groupId> -->
+        <!-- <artifactId>woodstox-core</artifactId> -->
+        <!-- <version>5.0.2</version> -->
+        <!-- </dependency> -->
 
-		<!-- https://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
-		<dependency>
-			<groupId>org.jgrapht</groupId>
-			<artifactId>jgrapht-core</artifactId>
-			<version>1.0.0</version>
-		</dependency>
+        <!-- https://mvnrepository.com/artifact/org.jgrapht/jgrapht-core -->
+        <dependency>
+            <groupId>org.jgrapht</groupId>
+            <artifactId>jgrapht-core</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.reactome</groupId>
-			<artifactId>curatortool</artifactId>
-			<version>1.0</version>
-		</dependency>
+        <dependency>
+            <groupId>org.reactome</groupId>
+            <artifactId>curatortool</artifactId>
+            <version>1.0</version>
+        </dependency>
 
-		<!-- This has been replaced by the following two jar files -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.reactome</groupId> -->
-		<!-- <artifactId>caBIGR3</artifactId> -->
-		<!-- <version>1.0</version> -->
-		<!-- </dependency> -->
+        <!-- This has been replaced by the following two jar files -->
+        <!-- <dependency> -->
+        <!-- <groupId>org.reactome</groupId> -->
+        <!-- <artifactId>caBIGR3</artifactId> -->
+        <!-- <version>1.0</version> -->
+        <!-- </dependency> -->
 
-		<dependency>
-			<groupId>org.reactome.fi</groupId>
-			<artifactId>modeling</artifactId>
-			<version>1.0.3</version>
-		</dependency>
+        <dependency>
+            <groupId>org.reactome.fi</groupId>
+            <artifactId>modeling</artifactId>
+            <version>1.0.3</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.reactome.fi</groupId>
+                    <artifactId>build</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<dependency>
-			<groupId>org.reactome</groupId>
-			<artifactId>RESTfulAPI</artifactId>
-			<version>1.0</version>
-		</dependency>
+        <dependency>
+            <groupId>org.reactome</groupId>
+            <artifactId>RESTfulAPI</artifactId>
+            <version>1.0</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.reactome</groupId>
-			<artifactId>FINetwork</artifactId>
-			<version>1.0</version>
-		</dependency>
+        <dependency>
+            <groupId>org.reactome.fi</groupId>
+            <artifactId>build</artifactId>
+            <version>2.0.0</version> <!-- For RF-based FI network -->
+        </dependency>
 
-		<dependency>
-			<groupId>colt</groupId>
-			<artifactId>colt</artifactId>
-			<version>1.2.0</version>
-		</dependency>
+        <dependency>
+            <groupId>colt</groupId>
+            <artifactId>colt</artifactId>
+            <version>1.2.0</version>
+        </dependency>
 
-		<!-- math 2.2 should be replaced by 3.2 in the future. For the time being, 
+        <!-- math 2.2 should be replaced by 3.2 in the future. For the time
+        being, 
 			both of them are used -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math</artifactId>
-			<version>2.2</version>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math</artifactId>
+            <version>2.2</version>
+        </dependency>
 
-		<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.4</version>
-		</dependency>
+        <!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.4</version>
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-math3</artifactId>
-			<version>3.5</version>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.5</version>
+        </dependency>
 
-		<!-- https://mvnrepository.com/artifact/commons-httpclient/commons-httpclient -->
-		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.0.1</version>
-		</dependency>
+        <!--
+        https://mvnrepository.com/artifact/commons-httpclient/commons-httpclient -->
+        <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.0.1</version>
+        </dependency>
 
 
-		<dependency>
-			<groupId>edu.ohsu.bcb</groupId>
-			<artifactId>druggability</artifactId>
-			<version>1.0</version>
-		</dependency>
+        <dependency>
+            <groupId>edu.ohsu.bcb</groupId>
+            <artifactId>druggability</artifactId>
+            <version>1.0</version>
+        </dependency>
 
-		<!-- https://mvnrepository.com/artifact/log4j/log4j -->
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/org.codehaus.jra/jra -->
-		<dependency>
-			<groupId>org.codehaus.jra</groupId>
-			<artifactId>jra</artifactId>
-			<version>1.0-alpha-4</version>
-		</dependency>
+        <!-- https://mvnrepository.com/artifact/log4j/log4j -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.codehaus.jra/jra -->
+        <dependency>
+            <groupId>org.codehaus.jra</groupId>
+            <artifactId>jra</artifactId>
+            <version>1.0-alpha-4</version>
+        </dependency>
 
-		<!-- JRI wrapper cannot work. Just keep the code there to make compiler 
+        <!-- JRI wrapper cannot work. Just keep the code there to make compiler 
 			happy. -->
-		<!-- https://mvnrepository.com/artifact/org.nuiton.thirdparty/JRI -->
-		<dependency>
-			<groupId>org.nuiton.thirdparty</groupId>
-			<artifactId>JRI</artifactId>
-			<version>0.9-6</version>
-		</dependency>
+        <!-- https://mvnrepository.com/artifact/org.nuiton.thirdparty/JRI -->
+        <dependency>
+            <groupId>org.nuiton.thirdparty</groupId>
+            <artifactId>JRI</artifactId>
+            <version>0.9-6</version>
+        </dependency>
 
-		<!-- https://mvnrepository.com/artifact/javax.transaction/jta -->
-		<dependency>
-			<groupId>javax.transaction</groupId>
-			<artifactId>jta</artifactId>
-			<version>1.1</version>
-		</dependency>
+        <!-- https://mvnrepository.com/artifact/javax.transaction/jta -->
+        <dependency>
+            <groupId>javax.transaction</groupId>
+            <artifactId>jta</artifactId>
+            <version>1.1</version>
+        </dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.sun.jersey/jersey-bundle -->
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-bundle</artifactId>
-			<version>1.2</version>
-		</dependency>
+        <!-- https://mvnrepository.com/artifact/com.sun.jersey/jersey-bundle -->
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-bundle</artifactId>
+            <version>1.2</version>
+        </dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.sun.jersey.contribs/jersey-spring -->
-		<dependency>
-			<groupId>com.sun.jersey.contribs</groupId>
-			<artifactId>jersey-spring</artifactId>
-			<version>1.2</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-web</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-beans</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.springframework</groupId>
-					<artifactId>spring-context</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+        <!--
+        https://mvnrepository.com/artifact/com.sun.jersey.contribs/jersey-spring -->
+        <dependency>
+            <groupId>com.sun.jersey.contribs</groupId>
+            <artifactId>jersey-spring</artifactId>
+            <version>1.2</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-web</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-beans</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-context</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.springframework/spring-web -->
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-			<version>3.0.2.RELEASE</version>
-		</dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework/spring-web -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>3.0.2.RELEASE</version>
+        </dependency>
 
-	</dependencies>
+        <!-- Added the following for Java 11 -->
+        <dependency>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>jaxws-ri</artifactId>
+            <version>2.3.0</version>
+            <type>pom</type>
+        </dependency>
 
-	<build>
-		<sourceDirectory>src/main/java</sourceDirectory>
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-				<!-- Use the default, which should be the top-level class -->
-				<!-- <targetPath></targetPath> -->
-				<includes>
-					<include>*.properties</include>
-					<!-- Need to specify the exact file name. Otherwise, pom.xml will be 
+    </dependencies>
+
+    <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/java</directory>
+                <!-- Use the default, which should be the top-level class -->
+                <!-- <targetPath></targetPath> -->
+                <includes>
+                    <include>*.properties</include>
+                    <!-- Need to specify the exact file name. Otherwise, pom.xml
+                    will be 
 						copied. -->
-					<include>ReactomePostMapperConfiguration.xml</include>
-				</includes>
-			</resource>
-			<resource>
-				<directory>src/main/java/org/reactome/r3/fi</directory>
-				<targetPath>org/reactome/r3/fi</targetPath>
-				<includes>
-					<include>*.xml</include>
-				</includes>
-			</resource>
-		</resources>
-		<plugins>
-		      <plugin>
+                    <include>ReactomePostMapperConfiguration.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/java/org/reactome/r3/fi</directory>
+                <targetPath>org/reactome/r3/fi</targetPath>
+                <includes>
+                    <include>*.xml</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <version>3.3.1</version>
             </plugin>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.5.1</version>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
 
-			<!-- Embedded Apache Tomcat required for testing war -->
-			<plugin>
-				<groupId>org.apache.tomcat.maven</groupId>
-				<artifactId>tomcat7-maven-plugin</artifactId>
-				<version>2.2</version>
-				<configuration>
-					<path>/corews</path>
-					<port>8080</port>
-				</configuration>
-			</plugin>
-		</plugins>
+            <!-- Embedded Apache Tomcat required for testing war -->
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <path>/corews</path>
+                    <port>8080</port>
+                </configuration>
+            </plugin>
+        </plugins>
 
-		<finalName>caBigR3WebApp2021</finalName>
-	</build>
+        <finalName>caBigR3WebApp2022</finalName>
+    </build>
 </project>

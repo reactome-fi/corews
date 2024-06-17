@@ -81,12 +81,12 @@
             <artifactId>c3p0</artifactId>
             <version>0.9.5.2</version>
         </dependency>
-        <!-- Mysql Connector -->
-        <dependency>
+        <!-- Mysql Connector. Let the other reactome-based jar to handle this. -->
+<!--        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>5.1.28</version>
-        </dependency>
+        </dependency>-->
         <!-- Jackson API for JSON -->
         <!-- <dependency> -->
         <!-- <groupId>com.fasterxml.jackson.core</groupId> -->
@@ -276,13 +276,13 @@
             <version>3.0.2.RELEASE</version>
         </dependency>
 
-        <!-- Added the following for Java 11 -->
-        <dependency>
+        <!-- Added the following for Java 11. The following works for Java 11 or above only. -->
+<!--        <dependency>
             <groupId>com.sun.xml.ws</groupId>
             <artifactId>jaxws-ri</artifactId>
             <version>2.3.0</version>
             <type>pom</type>
-        </dependency>
+        </dependency>-->
 
     </dependencies>
 
@@ -336,6 +336,6 @@
             </plugin>
         </plugins>
 
-        <finalName>caBigR3WebApp2022</finalName>
+        <finalName>caBigR3WebApp2024</finalName>
     </build>
 </project>

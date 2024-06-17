@@ -34,6 +34,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.junit.Test;
+import org.reactome.fi.util.FIConfiguration;
 import org.reactome.funcInt.FIAnnotation;
 import org.reactome.funcInt.Interaction;
 import org.reactome.funcInt.ReactomeSource;
@@ -891,7 +892,7 @@ public class InteractionAnnotator {
                 "inhibited by",
                 "catalyzed by",
                 "activate",
-                "inhibite",
+                "inhibit",
                 "catalyze",
                 "input",
                 "reaction", // Cannot see the difference
@@ -971,19 +972,14 @@ public class InteractionAnnotator {
         
         String resourceDir = fiNetworkBuildDir + "resources/";
         String configFile = resourceDir + "configuration.prop";
-        Properties config = new Properties();
-        config.load(new FileInputStream(configFile));
+        FIConfiguration config = FIConfiguration.getConfiguration(new FileInputStream(configFile));
         
-        String resultDir = config.getProperty("RESULT_DIR");
-        String dirName = resultDir.replace("${YEAR}", config.getProperty("YEAR")) + "/";
         MySQLAdaptor dba = new MySQLAdaptor("localhost",
-                                            config.getProperty("REACTOME_SOURCE_DB_NAME"),
-                                            config.getProperty("DB_USER"),
-                                            config.getProperty("DB_PWD"));
-        String tmp = config.getProperty("GENE_FI_FILE_NAME");
-        int index = tmp.lastIndexOf("/");
-        String fiFileName = dirName + tmp.substring(index + 1);
-        index = fiFileName.lastIndexOf(".");
+                                            config.get("REACTOME_SOURCE_DB_NAME"),
+                                            config.get("DB_USER"),
+                                            config.get("DB_PWD"));
+        String fiFileName = config.get("GENE_FI_FILE_NAME");
+        int index = fiFileName.lastIndexOf(".");
         String outFileName = fiFileName.substring(0, index) + "_with_annotations" + fiFileName.substring(index);
         File hibernateConfig = new File(resourceDir + "funcIntHibernate.cfg.xml");
         

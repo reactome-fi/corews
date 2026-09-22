@@ -7,6 +7,7 @@ package org.reactome.r3.fi;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,6 +35,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.junit.Test;
+import org.springframework.web.context.ServletContextAware;
 import org.reactome.fi.util.FIConfiguration;
 import org.reactome.funcInt.FIAnnotation;
 import org.reactome.funcInt.Interaction;
@@ -44,12 +46,14 @@ import org.reactome.r3.service.InteractionDAO;
 import org.reactome.r3.util.FileUtility;
 import org.reactome.r3.util.InteractionUtilities;
 
+import javax.servlet.ServletContext;
+
 /**
  * This class is used to annotate functional interactions.
  * @author wgm
  *
  */
-public class InteractionAnnotator {
+public class InteractionAnnotator implements ServletContextAware {
     private static final Logger logger = Logger.getLogger(InteractionAnnotator.class);
     private MySQLAdaptor dba;
     private InteractionDAO interationDAO;
@@ -842,8 +846,33 @@ public class InteractionAnnotator {
     private void initInteractionTypes() throws Exception {
         nameToType= new HashMap<String, FIAnnotation>();
         reverseNameToName = new HashMap<String, String>();
+        // Loaded from the classpath for standalone (non-webapp) usage. In a deployed
+        // webapp this resource may not resolve (e.g. broken symlink once copied into
+        // target/classes), so setServletContext() below re-loads it from WEB-INF instead.
+        loadInteractionTypesFromXml(getClass().getResourceAsStream("InteractionTypeMapper.xml"));
+        // Some specific type
+        FIAnnotation predictedType = new FIAnnotation();
+        predictedType.setAnnotation("predicted");
+        predictedType.setReverseAnnotation("predicted");
+        predictedType.setDirection("-");
+        nameToType.put(predictedType.getAnnotation(), predictedType);
+        // Some specific type
+        FIAnnotation unknownType = new FIAnnotation();
+        unknownType.setAnnotation("unknown");
+        nameToType.put(unknownType.getAnnotation(), unknownType);
+        loadReactionTypes(nameToType);
+    }
+
+    /**
+     * Parses InteractionTypeMapper.xml, if available, into nameToType/reverseNameToName.
+     * A null stream (resource not found) is treated as "nothing to add" rather than an error,
+     * since setServletContext() may still supply the types from WEB-INF afterwards.
+     */
+    private void loadInteractionTypesFromXml(InputStream is) throws Exception {
+        if (is == null)
+            return;
         SAXBuilder builder = new SAXBuilder();
-        Document document = builder.build(getClass().getResourceAsStream("InteractionTypeMapper.xml"));
+        Document document = builder.build(is);
         List list = document.getDocument().getRootElement().getChildren("type");
         for (Iterator it = list.iterator(); it.hasNext();) {
             Element elm = (Element) it.next();
@@ -857,17 +886,21 @@ public class InteractionAnnotator {
             nameToType.put(name, type);
             reverseNameToName.put(reverse, name);
         }
-        // Some specific type
-        FIAnnotation predictedType = new FIAnnotation();
-        predictedType.setAnnotation("predicted");
-        predictedType.setReverseAnnotation("predicted");
-        predictedType.setDirection("-");
-        nameToType.put(predictedType.getAnnotation(), predictedType);
-        // Some specific type
-        FIAnnotation unknownType = new FIAnnotation();
-        unknownType.setAnnotation("unknown");
-        nameToType.put(unknownType.getAnnotation(), unknownType);
-        loadReactionTypes(nameToType);
+    }
+
+    /**
+     * Called by Spring when this bean runs inside a webapp. The classpath lookup in
+     * initInteractionTypes() can fail to resolve InteractionTypeMapper.xml once packaged,
+     * so re-load it here directly from WEB-INF via the ServletContext.
+     */
+    @Override
+    public void setServletContext(ServletContext servletContext) {
+        try {
+            loadInteractionTypesFromXml(servletContext.getResourceAsStream("/WEB-INF/InteractionTypeMapper.xml"));
+        }
+        catch (Exception e) {
+            logger.error("Failed to load InteractionTypeMapper.xml from ServletContext", e);
+        }
     }
     
     private void loadReactionTypes(Map<String, FIAnnotation> nameToType) {
